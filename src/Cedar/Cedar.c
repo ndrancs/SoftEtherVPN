@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -235,18 +235,18 @@ bool IsSupportedWinVer(RPC_WINVER *v)
 		}
 	}
 
-#if	0
-	// Enable in future when supported
-	if (v->VerMajor == 6 && v->VerMinor == 4)
+	if ((v->VerMajor == 6 && v->VerMinor == 4) || (v->VerMajor == 10 && v->VerMinor == 0))
 	{
-		// Windows 10, Server 10
-		if (v->ServicePack <= 0)
+		if (v->IsServer == false)
 		{
-			// SP0 only
-			return true;
+			// Windows 10 (not Windows Server 2016)
+			if (v->ServicePack <= 0)
+			{
+				// SP0 only
+				return true;
+			}
 		}
 	}
-#endif
 
 	return false;
 }
@@ -908,6 +908,8 @@ void AddConnection(CEDAR *cedar, CONNECTION *c)
 	// Determine the name of the connection
 	i = Inc(cedar->ConnectionIncrement);
 	Format(tmp, sizeof(tmp), "CID-%u", i);
+
+
 	Lock(c->lock);
 	{
 		Free(c->Name);
@@ -1662,6 +1664,8 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 	c->CedarSuperLock = NewLock();
 
 	c->CurrentRegionLock = NewLock();
+
+	StrCpy(c->OpenVPNDefaultClientOption, sizeof(c->OpenVPNDefaultClientOption), OVPN_DEF_CLIENT_OPTION_STRING);
 
 #ifdef	BETA_NUMBER
 	c->Beta = BETA_NUMBER;

@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -193,6 +193,7 @@ struct UDP_ACCEL
 	UINT64 CreatedTick;									// Object creation time
 	bool FastDetect;									// Fast disconnection detection mode
 	UINT64 FirstStableReceiveTick;						// Start time of current stable continued receivable period
+	bool UseSuperRelayQuery;							// Use the super relay query
 	bool UseUdpIpQuery;									// Use the self IP address query by UDP
 	IP UdpIpQueryHost;									// Host for the self IP address query by UDP
 	UINT UdpIpQueryPort;								// Port number for self IP address for query by UDP

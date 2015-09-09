@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -116,11 +116,9 @@
 
 #define	BRIDGE_WIN32_PACKET_DLL		"Packet.dll"
 #define	BRIDGE_WIN32_PCD_DLL		"|see.dll"
-#define	BRIDGE_WIN32_PCD_SYS		"|see.sys"
+#define	BRIDGE_WIN32_PCD_SYS		"|DriverPackages\\See\\x86\\See_x86.sys"
 #define	BRIDGE_WIN32_PCD_DLL_X64	"|see_x64.dll"
-#define	BRIDGE_WIN32_PCD_SYS_X64	"|see_x64.sys"
-#define	BRIDGE_WIN32_PCD_DLL_IA64	"|see_ia64.dll"
-#define	BRIDGE_WIN32_PCD_SYS_IA64	"|see_ia64.sys"
+#define	BRIDGE_WIN32_PCD_SYS_X64	"|DriverPackages\\See\\x64\\See_x64.sys"
 #define	BRIDGE_WIN32_PCD_REGKEY		"SYSTEM\\CurrentControlSet\\services\\SEE"
 #define	BRIDGE_WIN32_PCD_BUILDVALUE	"CurrentInstalledBuild"
 

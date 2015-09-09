@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -8450,7 +8450,7 @@ bool CtCreateVLan(CLIENT *c, RPC_CLIENT_CREATE_VLAN *create)
 		return false;
 	}
 
-	// Regulation in Windows 8
+	// Regulation in Windows 8 / 10
 	if (MsIsInfCatalogRequired())
 	{
 		if (CiIsValidVLanRegulatedName(create->DeviceName) == false)
@@ -10462,7 +10462,7 @@ void CiWriteSettingToCfg(CLIENT *c, FOLDER *root)
 }
 
 // Create the inner VPN Server
-SERVER *CiNewInnerVPNServer(CLIENT *c)
+SERVER *CiNewInnerVPNServer(CLIENT *c, bool relay_server)
 {
 	SERVER *s = NULL;
 	// Validate arguments
@@ -10473,7 +10473,7 @@ SERVER *CiNewInnerVPNServer(CLIENT *c)
 
 	SetNatTLowPriority();
 
-	s = SiNewServerEx(false, true);
+	s = SiNewServerEx(false, true, relay_server);
 
 	return s;
 }
@@ -10589,6 +10589,13 @@ CLIENT *CiNewClient()
 		ci_active_sessions_lock = NewLock();
 		ci_num_active_sessions = 0;
 	}
+
+#ifdef	OS_WIN32
+	if (MsIsWindows7())
+	{
+		c->MsSuspendHandler = MsNewSuspendHandler();
+	}
+#endif	// OS_WIN32
 
 
 	c->CmSetting = ZeroMalloc(sizeof(CM_SETTING));
@@ -10810,6 +10817,13 @@ void CiCleanupClient(CLIENT *c)
 
 	Free(c->CmSetting);
 
+
+#ifdef	OS_WIN32
+	if (c->MsSuspendHandler != NULL)
+	{
+		MsFreeSuspendHandler(c->MsSuspendHandler);
+	}
+#endif	// OS_WIN32
 
 	Free(c);
 

@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -227,7 +227,7 @@ static UINT SupportedOids[] =
     WCHAR *_P;\
     _D->Length = (USHORT)((strlen(_S)) * sizeof(WCHAR));\
     _D->MaximumLength = _D->Length + sizeof(WCHAR);\
-    NdisAllocateMemoryWithTag((PVOID *)&(_D->Buffer), _D->MaximumLength, 0);\
+    NdisAllocateMemoryWithTag((PVOID *)&(_D->Buffer), _D->MaximumLength, 'SETH');\
     _P = _D->Buffer;\
     while(*_S != '\0'){\
         *_P = (WCHAR)(*_S);\

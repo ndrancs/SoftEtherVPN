@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -672,6 +672,9 @@ struct RPC_ENUM_SESSION_ITEM
 	bool Client_MonitorMode;						// Client is monitoring mode
 	UINT VLanId;									// VLAN ID
 	UCHAR UniqueId[16];								// Unique ID
+	bool IsDormantEnabled;							// Is the dormant state enabled
+	bool IsDormant;									// Is in the dormant state
+	UINT64 LastCommDormant;							// Last comm interval in the dormant state
 };
 
 // Disconnect the session

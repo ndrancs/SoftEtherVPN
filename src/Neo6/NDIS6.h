@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -184,6 +184,8 @@ static UINT SupportedOids[] =
 	OID_GEN_STATISTICS,
 	OID_GEN_INTERRUPT_MODERATION,
 	OID_GEN_LINK_PARAMETERS,
+	OID_PNP_SET_POWER,
+	OID_PNP_QUERY_POWER,
 	};
 #define	NEO_MEDIA					NdisMedium802_3
 #define	MAX_MULTICAST				32
@@ -237,7 +239,7 @@ void NeoNdisSendNetBufferLists(NDIS_HANDLE MiniportAdapterContext,
 							   NET_BUFFER_LIST *NetBufferLists,
 							   NDIS_PORT_NUMBER PortNumber,
 							   ULONG SendFlags);
-BOOL NeoNdisSendPacketsHaltCheck(NET_BUFFER_LIST *NetBufferLists);
+void NeoNdisSetNetBufferListsStatus(NET_BUFFER_LIST *nbl, UINT status);
 BOOL NeoLoadRegistory();
 void NeoInitControlDevice();
 void NeoFreeControlDevice();

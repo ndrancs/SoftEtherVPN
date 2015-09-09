@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -118,13 +118,25 @@
 #define	RADIUS_RETRY_INTERVAL	500				// Retransmission interval
 #define	RADIUS_RETRY_TIMEOUT	(10 * 1000)		// Time-out period
 
+
+// RADIUS attributes
+#define	RADIUS_ATTRIBUTE_VLAN_ID	81
+
+struct RADIUS_LOGIN_OPTION
+{
+	bool In_CheckVLanId;
+	UINT Out_VLanId;
+};
+
 // Function prototype
-bool RadiusLogin(CONNECTION *c, char *server, UINT port, UCHAR *secret, UINT secret_size, wchar_t *username, char *password, UINT interval, UCHAR *mschap_v2_server_response_20);
+bool RadiusLogin(CONNECTION *c, char *server, UINT port, UCHAR *secret, UINT secret_size, wchar_t *username, char *password, UINT interval, UCHAR *mschap_v2_server_response_20,
+				 RADIUS_LOGIN_OPTION *opt);
 BUF *RadiusEncryptPassword(char *password, UCHAR *random, UCHAR *secret, UINT secret_size);
 BUF *RadiusCreateUserName(wchar_t *username);
 BUF *RadiusCreateUserPassword(void *data, UINT size);
 BUF *RadiusCreateNasId(char *name);
 void RadiusAddValue(BUF *b, UCHAR t, UINT v, UCHAR vt, void *data, UINT size);
+LIST *RadiusParseOptions(BUF *b);
 
 #endif	// RADIUS_H
 

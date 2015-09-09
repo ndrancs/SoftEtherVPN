@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -139,13 +139,7 @@ namespace BuildUtil
 	{
 		public static void Test()
 		{
-			Language[] langs = BuildHelper.GetLanguageList();
-
-			foreach (Language e in langs)
-			{
-				Con.WriteLine("{0} {1} {2} {3} {5} {4}",
-					e.Number, e.Id, e.Title, e.TitleUnicode, e.UnixLocaleIds, e.WindowsLocaleIds);
-			}
+			Win32BuildUtil.MakeDriverPackage();
 		}
 	}
 }

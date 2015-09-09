@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -210,6 +210,12 @@ void NeoWrite(void *buf)
 	if (ctx->Halting != FALSE)
 	{
 		// Stopping
+		return;
+	}
+
+	if (ctx->Paused)
+	{
+		// Paused
 		return;
 	}
 
@@ -424,10 +430,14 @@ void NeoInitPacketQueue()
 }
 
 // Delete all the packets from the packet queue
-void NeoClearPacketQueue()
+void NeoClearPacketQueue(bool no_lock)
 {
 	// Release the memory of the packet queue
-	NeoLock(ctx->PacketQueueLock);
+	if (no_lock == false)
+	{
+		NeoLock(ctx->PacketQueueLock);
+	}
+	if (true)
 	{
 		NEO_QUEUE *q = ctx->PacketQueue;
 		NEO_QUEUE *qn;
@@ -442,14 +452,17 @@ void NeoClearPacketQueue()
 		ctx->Tail = NULL;
 		ctx->NumPacketQueue = 0;
 	}
-	NeoUnlock(ctx->PacketQueueLock);
+	if (no_lock == false)
+	{
+		NeoUnlock(ctx->PacketQueueLock);
+	}
 }
 
 // Release the packet queue
 void NeoFreePacketQueue()
 {
 	// Delete all packets
-	NeoClearPacketQueue();
+	NeoClearPacketQueue(false);
 
 	// Delete the lock
 	NeoFreeLock(ctx->PacketQueueLock);

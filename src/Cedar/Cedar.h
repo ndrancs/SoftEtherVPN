@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -135,10 +135,10 @@
 
 
 // Version number
-#define	CEDAR_VER					410
+#define	CEDAR_VER					418
 
 // Build Number
-#define	CEDAR_BUILD					9505
+#define	CEDAR_BUILD					9570
 
 // Beta number
 //#define	BETA_NUMBER					3
@@ -153,16 +153,16 @@
 
 // Specify the location to build
 #ifndef	BUILD_PLACE
-#define	BUILD_PLACE			"pc25"
+#define	BUILD_PLACE			"pc30"
 #endif	// BUILD_PLACE
 
 // Specifies the build date
-#define	BUILD_DATE_Y		2014
-#define	BUILD_DATE_M		10
-#define	BUILD_DATE_D		3
-#define	BUILD_DATE_HO		17
-#define	BUILD_DATE_MI		55
-#define	BUILD_DATE_SE		4
+#define	BUILD_DATE_Y		2015
+#define	BUILD_DATE_M		7
+#define	BUILD_DATE_D		26
+#define	BUILD_DATE_HO		14
+#define	BUILD_DATE_MI		59
+#define	BUILD_DATE_SE		55
 
 // Tolerable time difference
 #define	ALLOW_TIMESTAMP_DIFF		(UINT64)(3 * 24 * 60 * 60 * 1000)
@@ -242,7 +242,7 @@
 #define	FIFO_BUDGET					VPN_GP(GP_FIFO_BUDGET, 1000000)
 #endif	// USE_STRATEGY_LOW_MEMORY
 
-#define	MAX_PACKET_SIZE				1560	// Maximum packet size
+#define	MAX_PACKET_SIZE				1600	// Maximum packet size
 #define	UDP_BUF_SIZE				(32 * 1024) // Aim of the UDP packet size
 
 #ifndef	USE_STRATEGY_LOW_MEMORY
@@ -941,6 +941,7 @@
 #define	ERR_VPNGATE_CLIENT				145 // Operation on VPN Gate Client is not available
 #define	ERR_VPNGATE_INCLIENT_CANT_STOP	146	// Can not be stopped if operating within VPN Client mode
 #define	ERR_NOT_SUPPORTED_FUNCTION_ON_OPENSOURCE	147	// It is a feature that is not supported in the open source version
+#define	ERR_SUSPENDING					148	// System is suspending
 
 
 ////////////////////////////
@@ -1051,6 +1052,8 @@ typedef struct CEDAR
 	UINT QueueBudget;				// Queue budget
 	LOCK *FifoBudgetLock;			// Fifo budget lock
 	UINT FifoBudget;				// Fifo budget
+	bool AcceptOnlyTls;				// Accept only TLS (Disable SSL)
+	char OpenVPNDefaultClientOption[MAX_SIZE];	// OpenVPN Default Client Option String
 } CEDAR;
 
 // Type of CEDAR

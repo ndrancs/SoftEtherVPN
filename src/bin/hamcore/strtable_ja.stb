@@ -212,6 +212,7 @@ ERR_144					この操作は実行できません。VPN Gate 中継サーバー�
 ERR_145					この操作は実行できません。VPN Gate 公開 VPN 中継サーバーの接続設定に関する操作は VPN Gate の設定画面から実行してください。
 ERR_146					VPN Gate サービスが VPN Client 内で動作している場合は、この設定画面から VPN Gate サービスを停止することはできません。VPN Gate サービスを停止するには、VPN Client 接続マネージャの設定ツールを使用してください。
 ERR_147					この機能はオープンソース版 SoftEther VPN にはまだ実装されていません。
+ERR_148					Windows システムがサスペンド状態に移行中のため、VPN 通信が切断されました。
 
 
 
@@ -235,10 +236,10 @@ TCPOPT_NOT_ADMIN		TCP/IP 通信設定最適化ユーティリティは、管理�
 
 
 # Windows Vista / Windows 7 / Windows 8 用最適化関係
-VISTA_MMCSS_MSG			Windows Vista / Windows 7 / Windows 8 で VPN 通信を経由してマルチメディアファイル (ビデオやオーディオ、ストリーミングなど) を再生するための最適化をしますか?
-VISTA_MMCSS_MSG_2		すでに Windows Vista / Windows 7 / Windows 8 で VPN 通信を経由してマルチメディアファイル (ビデオやオーディオ、ストリーミングなど) を再生するための最適化の設定が行われています。\r\n最適化設定を削除して、元に戻しますか?
+VISTA_MMCSS_MSG			Windows Vista / Windows 7 / Windows 8 / Windows 10 で VPN 通信を経由してマルチメディアファイル (ビデオやオーディオ、ストリーミングなど) を再生するための最適化をしますか?
+VISTA_MMCSS_MSG_2		すでに Windows Vista / Windows 7 / Windows 8 / Windows 10 で VPN 通信を経由してマルチメディアファイル (ビデオやオーディオ、ストリーミングなど) を再生するための最適化の設定が行われています。\r\n最適化設定を削除して、元に戻しますか?
 VISTA_MMCSS_MSG_3		現在の環境では、最適化の機能は使用できません。
-VISTA_MMCSS_MSG_4		この機能は、Administrators 権限でプログラムを起動している際にのみ使用できます。\r\nWindows Vista / Windows 7 / Windows 8 の場合は、[管理者として実行] 機能を使用してプログラムを実行してください。
+VISTA_MMCSS_MSG_4		この機能は、Administrators 権限でプログラムを起動している際にのみ使用できます。\r\nWindows Vista / Windows 7 / Windows 8 / Windows 10 の場合は、[管理者として実行] 機能を使用してプログラムを実行してください。
 VISTA_MMCSS_MSG_5		最適化設定が完了しました。
 VISTA_MMCSS_MSG_6		最適化設定は削除されました。
 
@@ -572,6 +573,10 @@ HUB_AO_DropBroadcastsInPrivacyFilterMode	送信元および宛先の両方のセ
 HUB_AO_DropArpInPrivacyFilterMode			送信元および宛先の両方のセッションがプライバシーフィルタモードの場合、ARP パケットを破棄します。
 HUB_AO_SuppressClientUpdateNotification		VPN Client のアップデート通知画面の表示を抑制します。
 HUB_AO_FloodingSendQueueBufferQuota			パケットの仮想 HUB 内におけるフラッディング動作時において消費することを許容する送信キューのバッファサイズの制限値 (バイト数) を指定します。クオータは、すべての接続中の VPN セッションの送信キューの合計長さに対してグローバルに適用されます。0 を指定すると無制限になります。このオプションは、フラッディングパケットが多発するネットワークにおいてメモリ消費量が増大する問題を解決するために利用できます。
+HUB_AO_AssignVLanIdByRadiusAttribute		VLAN ID の動的割り当て機能を有効にします。VPN 接続するユーザーオブジェクトのセキュリティポリシーに VLAN ID が指定されていない場合は、各 VPN セッションはユーザー認証を行った RADIUS サーバーから返却される RADIUS 属性の値に基づき VLAN が割当てられます。RADIUS 属性のうち、 "Tunnel-Pvt-Group-ID" (ID = 81) の値が使用されます。データ型は文字列である必要があります。
+HUB_AO_SecureNAT_RandomizeAssignIp			この項目が 1 (有効) の場合は、SecureNAT 機能における仮想 DHCP サーバーは、DHCP クライアントに対して割当てる IP アドレスを指定された IP アドレスプール内の未使用アドレスからランダムに選択するようになります。なお、既定の動作は、未使用アドレスのうち最初のアドレスを割当てるようになっています。
+HUB_AO_DetectDormantSessionInterval			この項目が 0 以外の場合は、指定された秒数無通信であった VPN セッションをドーマント状態 (休止状態) として識別します。ドーマント状態の VPN セッションに対しては、仮想 HUB 内でフラッディングされるべきパケットがフラッディングされなくなります。
+HUB_AO_NoPhysicalIPOnPacketLog				この項目が 0 (有効) の場合は、パケットログに送信元および宛先 VPN セッションの物理的な接続元 VPN クライアントの IP アドレスが記録されないようになります。
 
 
 # Caps 関係
@@ -1450,24 +1455,24 @@ SM_SESS_STATUS_REALUSER	ユーザー名 (データベース)
 SM_SESS_STATUS_GROUPNAME	グループ名
 SM_CLIENT_IP			クライアント IP アドレス
 SM_CLIENT_HOSTNAME		クライアントホスト名
-SM_NODE_CLIENT_NAME		クライアント製品名
-SM_NODE_CLIENT_VER		クライアントバージョン
-SM_NODE_CLIENT_BUILD	クライアントビルド番号
-SM_NODE_SERVER_NAME		サーバー製品名
-SM_NODE_SERVER_VER		サーバーバージョン
-SM_NODE_SERVER_BUILD	サーバービルド番号
-SM_NODE_CLIENT_OS_NAME	クライアント OS 名
-SM_NODE_CLIENT_OS_VER	クライアント OS バージョン
-SM_NODE_CLIENT_OS_PID	クライアント OS プロダクト ID
-SM_NODE_CLIENT_HOST		クライアントホスト名
-SM_NODE_CLIENT_IP		クライアント IP アドレス
-SM_NODE_CLIENT_PORT		クライアントポート番号
-SM_NODE_SERVER_HOST		サーバーホスト名
-SM_NODE_SERVER_IP		サーバー IP アドレス
-SM_NODE_SERVER_PORT		サーバーポート番号
-SM_NODE_PROXY_HOSTNAME	経由プロキシホスト名
-SM_NODE_PROXY_IP		経由プロキシ IP アドレス
-SM_NODE_PROXY_PORT		経由プロキシポート番号
+SM_NODE_CLIENT_NAME		クライアント製品名 (申告)
+SM_NODE_CLIENT_VER		クライアントバージョン (申告)
+SM_NODE_CLIENT_BUILD	クライアントビルド番号 (申告)
+SM_NODE_SERVER_NAME		サーバー製品名 (申告)
+SM_NODE_SERVER_VER		サーバーバージョン (申告)
+SM_NODE_SERVER_BUILD	サーバービルド番号 (申告)
+SM_NODE_CLIENT_OS_NAME	クライアント OS 名 (申告)
+SM_NODE_CLIENT_OS_VER	クライアント OS バージョン (申告)
+SM_NODE_CLIENT_OS_PID	クライアント OS プロダクト ID (申告)
+SM_NODE_CLIENT_HOST		クライアントホスト名 (申告)
+SM_NODE_CLIENT_IP		クライアント IP アドレス (申告)
+SM_NODE_CLIENT_PORT		クライアントポート番号 (申告)
+SM_NODE_SERVER_HOST		サーバーホスト名 (申告)
+SM_NODE_SERVER_IP		サーバー IP アドレス (申告)
+SM_NODE_SERVER_PORT		サーバーポート番号 (申告)
+SM_NODE_PROXY_HOSTNAME	経由プロキシホスト名 (申告)
+SM_NODE_PROXY_IP		経由プロキシ IP アドレス (申告)
+SM_NODE_PROXY_PORT		経由プロキシポート番号 (申告)
 SM_MAC_COLUMN_1			セッション名
 SM_MAC_COLUMN_2			MAC アドレス
 SM_MAC_COLUMN_3			作成時刻
@@ -1648,7 +1653,7 @@ SM_FACTORY_DEFAULT_WARNING		VPN Server / Bridge の設定をリセットしま�
 SM_FACTORY_DEFAULT_PERFORMED	設定のリセット処理はサーバー上で開始されました。\r\n\r\nOk をクリックすると現在の VPN サーバー管理マネージャのセッションを終了します。\r\n終了した後に、VPN サーバー管理マネージャを再度起動して VPN Server に再接続してください。\r\n再接続すると、設定がリセットされた後の VPN Server が出現します。
 SM_AZURE_STATUS_CONNECTED		状態: クラウドに接続完了
 SM_AZURE_STATUS_NOT_CONNECTED	状態: クラウドに未接続
-SM_NO_BRIDGE_NICS				ローカルブリッジを作成することができる物理的な LAN カードが VPN サーバーのコンピュータに 1 枚も見つかりませんでした。\r\n\r\nローカルブリッジを作成するには、物理的な LAN カードを 1 枚以上コンピュータにインストールする必要があります。\r\n無線 LAN カード、3G アダプタ等は使用できません。\r\n通常のケーブル接続の Ethernet に対応した LAN カードをインストールしてください。\r\n\r\n最近インストールした LAN カードが表示されない場合は、一度コンピュータを再起動してください。\r\n\r\nローカルブリッジを使用できない場合は、代わりに「SecureNAT 機能」の仮想 NAT 機能の使用を検討してください。\r\n\r\nなお、何らかの理由で物理的な LAN カード以外の LAN カード (無線 LAN、仮想 LAN など) を使用したい場合は、設定ファイルの "LocalBridgeList" ディレクティブ内の "ShowAllInterfaces" を "true" にして VPN Server を再起動するとこれらのデバイスも表示されるようになります。(上級者向け、Windows のみ)
+SM_NO_BRIDGE_NICS				ローカルブリッジを作成することができる物理的な LAN カードが VPN サーバーのコンピュータに 1 枚も見つかりませんでした。\r\n\r\nローカルブリッジを作成するには、物理的な LAN カードを 1 枚以上コンピュータにインストールする必要があります。\r\n無線 LAN カード、3G アダプタ等は使用できません。\r\n通常のケーブル接続の Ethernet に対応した LAN カードをインストールしてください。\r\n\r\n最近インストールした LAN カードが表示されない場合は、一度コンピュータを再起動してください。\r\n\r\nローカルブリッジを使用できない場合は、代わりに「SecureNAT 機能」の仮想 NAT 機能の使用を検討してください。\r\n\r\nなお、何らかの理由で物理的な LAN カード以外の LAN カード (無線 LAN、仮想 LAN など) を使用したい場合は、設定ファイルの "LocalBridgeList" ディレクティブ内の "ShowAllInterfaces" を "true" にして VPN Server を再起動するとこれらのデバイスも表示されるようになります。(上級者向け、Windows のみ)\r\n\r\nWindows をアップグレードした後にこの問題が発生するようになった場合は、SoftEther VPN Server または SoftEther VPN Bridge を再インストールしてみてください。
 SM_CERT_MESSAGE					現在サーバーに設定されている SSL 自己署名ルート証明書は古い形式です。\r\n\r\nOpenVPN プロトコルを用いてこの VPN Server に接続しているクライアントが存在する場合、現在のサーバー証明書の使用を継続すると、OpenVPN Connect for Android で不具合が発生する可能性があります。\r\n\r\nOpenVPN Connect for Android を使用してこの VPN Server に VPN 接続を行っている場合は、サーバー証明書を再作成して更新することをお勧めします。\r\n\r\nサーバー証明書を再作成して更新しますか?
 SM_CERT_MESSAGE_CLI				--- ご注意 ---\r\n\r\n現在サーバーに設定されている SSL 自己署名ルート証明書は古い形式です。\r\n\r\n現在のサーバー証明書の使用を継続した場合、OpenVPN Connect for Android で不具合が発生する可能性があります。\r\n\r\nOpenVPN Connect for Android を使用してこの VPN Server に VPN 接続を行っている場合は、サーバー証明書を再作成して更新することをお勧めします。\r\n\r\nサーバー証明書を再作成して更新するには、VPN Server を最新版にアップデートしてから、"ServerCertRegenerate" コマンドを実行してください。
 SM_CERT_NEED_ROOT				指定された SSL 証明書は、証明機関 (CA) によって発行された証明書です。\r\n\r\nこの VPN Server に Microsoft SSTP または OpenVPN プロトコルで VPN 接続を行う場合は、ルート証明書および中間証明書 (存在する場合) を VPN Server にインストールする必要があります。\r\n\r\nVPN Server にルート証明書および中間証明書をインストールするためには、X.509 証明書のルート証明書および中間証明書ファイルを VPN Server がインストールされているディレクトリの中にある "chain_certs" サブディレクトリにコピーしてください。\r\n\r\nルート証明書および中間証明書ファイルの取得方法は、証明機関 (CA) が発行している Web サイトをお読みいただくか、証明機関 (CA) のサポートに問い合わせてください。
@@ -1906,6 +1911,7 @@ LH_MAX_SESSION_2		コネクション "%S": VPN Server 上で管理すること�
 LH_NEW_SESSION			コネクション "%S": 新しいセッション "%S" が作成されました。(IP アドレス %S, ポート番号 %u, 物理レイヤのプロトコル: "%S")
 LH_SET_SESSION			セッション "%S": パラメータが設定されました。最大 TCP コネクション数 %u, 暗号化の使用 %s, 圧縮の使用 %s, 半二重通信の使用 %s, タイムアウト %u 秒
 LH_NODE_INFO			セッション "%S": VPN Client の詳細: (%s)
+LH_VLAN_ID				セッション "%S": 割り当てられた VLAN ID: %u
 LH_INVALID_SIGNATURE	セッション "%S": 接続してきたクライアントが無効なプロトコルデータを送信しました。クライアントとの通信が正常にできません。クライアントとこのサーバーとの間のネットワーク回線に異常が無いかどうか、特殊な透過型パケット書き換え装置を設置していないかどうか確認してください。
 LH_END_SESSION			セッション "%S": セッションが終了しました。統計情報は次の通りです。合計送信データサイズ: %I64u バイト, 合計受信データサイズ: %I64u バイト
 LH_BCAST_STORM			セッション "%S": 大量のブロードキャストパケットを検出しました。ポリシーに従ってパケットを破棄する場合があります。送信元 MAC アドレスは %S, 送信元 IP アドレスは %S, 宛先 IP アドレスは %S です。ブロードキャストパケット数は 1 秒間に %u 個以上です (なおこの情報はパケットの一部を機械的に解析した結果であり、不正確な場合があります)。
@@ -2371,7 +2377,7 @@ S_INFO					新しい仮想 LAN カードをシステムに追加します。\r\n
 STATIC1					仮想 LAN カードの名前(&N):
 IDOK					&OK
 IDCANCEL				キャンセル
-S_WIN8					現在の OS は Windows 8 です。仮想 LAN カード名には 'VPN'、または 'VPN2' から 'VPN127' までの名前を指定してください (合計 127 個作成可能)。
+S_WIN8					仮想 LAN カード名には 'VPN'、または 'VPN2' から 'VPN127' までの名前を指定してください (合計 127 個作成可能)。
 
 
 PREFIX					D_CM_TRUST
@@ -3844,7 +3850,7 @@ S_TOOL					OpenVPN クライアント用サンプル設定ファイル自動作�
 S_TOOL2					本来、OpenVPN クライアントを使うためには設定ファイルを手動で記述する必要があり、これは難易度が高い作業です。しかし、以下のボタンをクリックするだけでこの VPN Server に接続することができる基本的な OpenVPN クライアント用の設定ファイルを自動的に生成することができます。
 B_CONFIG				OpenVPN クライアント用のサンプル設定ファイルを生成(&C)
 S_2						Microsoft SSTP VPN 互換サーバー機能
-S_3						Microsoft 社の Windows Server 2008 / 2012 製品に搭載されている MS-SSTP VPN サーバー機能と互換性がある機能を搭載しています。\r\n\r\nWindows Vista / 7 / 8 / RT に標準搭載の MS-SSTP クライアントからこの VPN Server に接続できます。
+S_3						Microsoft 社の Windows Server 2008 / 2012 製品に搭載されている MS-SSTP VPN サーバー機能と互換性がある機能を搭載しています。\r\n\r\nWindows Vista / 7 / 8 / RT / 10 に標準搭載の MS-SSTP クライアントからこの VPN Server に接続できます。
 R_SSTP					&MS-SSTP VPN サーバー機能を有効にする
 S_SSTP					VPN Server の SSL 証明書の CN の値がクライアント側で指定するホスト名と一致し、かつその証明書が信頼されている必要があります。詳しくは Microsoft 社のドキュメントを参照してください。
 S_4						これらの互換サーバー機能で仮想 HUB に接続する場合のユーザー名の指定方法、およびデフォルト仮想 HUB の選択規則は、IPsec サーバー機能と同様です。
@@ -4215,7 +4221,7 @@ CMD_SWITCH_SELECT		選択の切り替え(&I)
 # [表示] メニュー
 CMD_TOP_VIEW			表示(&V)
 CMD_STATUSBAR			ステータスバーの表示(&S)
-CMD_VISTASTYLE			Windows Vista / Windows 7 スタイル(&Y)
+CMD_VISTASTYLE			Windows Vista / 7 / 8 / 10 スタイル(&Y)
 CMD_SHOWPORT			ポート番号を接続設定一覧に表示(&P)
 CMD_TRAYICON			タスクトレイのアイコンの表示(&T)
 CMD_ICON				アイコン(&I)
@@ -4240,7 +4246,7 @@ CMD_PASSWORD			パスワードの設定(&P)...\tCtrl+P
 CMD_TRUST				信頼する証明機関の証明書の管理(&T)...\tCtrl+R
 CMD_NETIF				ネットワークデバイスの状態(&N)...
 CMD_TCPIP				TCP/IP 最適化ユーティリティ(&U)...
-CMD_MMCSS				Windows Vista / Windows 7 / Windows 8 のための最適化機能(&V)...
+CMD_MMCSS				Windows Vista / 7 / 8 / 10 のための最適化機能(&V)...
 CMD_TRAFFIC				通信スループット測定ツール(&R)...\tCtrl+Q
 CMD_CM_SETTING			動作モードの変更(&M)...
 CMD_LANGUAGE			表示言語の変更(&L)...
@@ -5691,7 +5697,7 @@ CMD_UserRadiusSet_Prompt_ALIAS	認証用エイリアス名 (オプション):
 
 # UserNTLMSet コマンド
 CMD_UserNTLMSet			ユーザーの認証方法を NT ドメイン認証に設定
-CMD_UserNTLMSet_Help	現在管理している仮想 HUB の、セキュリティアカウントデータベースに登録されているユーザーの認証方法を「NT ドメイン認証」に設定します。NT ドメイン認証に設定されているユーザー名でユーザーが仮想 HUB に接続した際に、ユーザー名とユーザーが入力したパスワードが Windows NT / 2000 / Server 2003 / Server 2008 / Server 2008 R2 / Server 2012 のドメインコントローラ、または Active Directory サーバーに送信され、認証サーバーがユーザー名とパスワードのチェックを行った後に認証が成功すると、そのユーザーの VPN 接続が許可されます。\nNT ドメイン認証を使用するには、VPN Server がそのドメインに接続されている Windows NT 4.0, Windows 2000, Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008, Windows 7, Windows Server 2008 R2, Windows 8, Windows Server 2012 のいずれかのオペレーティングシステム上で動作している必要があります。詳しくは VPN Server の管理者にお問い合わせください。\n現在登録されているユーザーの一覧を取得するには、UserList コマンドを使用してください。\nこのコマンドは、VPN Bridge では実行できません。\nこのコマンドは、クラスタ内でクラスタメンバサーバーとして動作している VPN Server の仮想 HUB では実行できません。
+CMD_UserNTLMSet_Help	現在管理している仮想 HUB の、セキュリティアカウントデータベースに登録されているユーザーの認証方法を「NT ドメイン認証」に設定します。NT ドメイン認証に設定されているユーザー名でユーザーが仮想 HUB に接続した際に、ユーザー名とユーザーが入力したパスワードが Windows NT / 2000 / Server 2003 / Server 2008 / Server 2008 R2 / Server 2012 のドメインコントローラ、または Active Directory サーバーに送信され、認証サーバーがユーザー名とパスワードのチェックを行った後に認証が成功すると、そのユーザーの VPN 接続が許可されます。\nNT ドメイン認証を使用するには、VPN Server がそのドメインに接続されているオペレーティングシステム上で動作している必要があります。詳しくは VPN Server の管理者にお問い合わせください。\n現在登録されているユーザーの一覧を取得するには、UserList コマンドを使用してください。\nこのコマンドは、VPN Bridge では実行できません。\nこのコマンドは、クラスタ内でクラスタメンバサーバーとして動作している VPN Server の仮想 HUB では実行できません。
 CMD_UserNTLMSet_Args	UserNTLMSet [name] [/ALIAS:alias_name]
 CMD_UserNTLMSet_[name]	設定を変更するユーザー名を指定します。
 CMD_UserNTLMSet_ALIAS	このパラメータが設定されている場合、NT ドメインまたは Active Directory に対して送信されるユーザー名を、仮想 HUB 上のユーザー名とは別のユーザー名にすることが可能です。設定しない場合は、/ALIAS:none と指定してください (仮想 HUB 上のユーザー名が使用されます)。ユーザー名が "*" の場合は /ALIAS パラメータは無視されます。"*" ユーザーについての説明は、UserCreate /HELP と入力すると表示されます。
@@ -6226,7 +6232,7 @@ CMD_OpenVpnMakeConfig_ERROR			サンプル設定ファイルを "%s" ファイ�
 
 # SstpEnable コマンド
 CMD_SstpEnable			Microsoft SSTP VPN 互換サーバー機能を有効化 / 無効化
-CMD_SstpEnable_Help		SoftEther VPN Server には Microsoft 社の Windows Server 2008 / 2012 製品に搭載されている MS-SSTP VPN サーバー機能と互換性がある機能が搭載されています。Microsoft SSTP VPN 互換サーバー機能を有効にすると、Windows Vista / 7 / 8 / RT に標準搭載の MS-SSTP クライアントからこの VPN Server に接続できるようになります。\n\n[ご注意]\nVPN Server の SSL 証明書の CN の値がクライアント側で指定するホスト名と一致し、かつその証明書が信頼されている必要があります。詳しくは Microsoft 社のドキュメントを参照してください。\n指定された CN の値を持つ新しい SSL 証明書 (自己署名証明書) を生成して VPN Server の現在の証明書と置換するためには、ServerCertRegenerate コマンドを使用してください。この場合は、当該証明書を SSTP VPN クライアントのコンピュータの信頼されるルート証明書として登録する必要があります。このような手間をかけたくない場合は、代わりに VeriSign や GlobalSign 社などの市販の証明書業者の SSL 証明書の取得を検討してください。\n\nMicrosoft SSTP VPN 互換サーバー機能で仮想 HUB に接続する場合のユーザー名の指定方法、およびデフォルト仮想 HUB の選択規則は、IPsec サーバー機能と同様です。詳しくは IPsecEnable コマンドのヘルプを参照してください。\n\nこのコマンドを実行するには、VPN Server の管理者権限が必要です。\nこのコマンドは、VPN Bridge では実行できません。\nこのコマンドは、クラスタとして動作している VPN Server の仮想 HUB では実行できません。
+CMD_SstpEnable_Help		SoftEther VPN Server には Microsoft 社の Windows Server 2008 / 2012 製品に搭載されている MS-SSTP VPN サーバー機能と互換性がある機能が搭載されています。Microsoft SSTP VPN 互換サーバー機能を有効にすると、Windows Vista / 7 / 8 / RT / 10 に標準搭載の MS-SSTP クライアントからこの VPN Server に接続できるようになります。\n\n[ご注意]\nVPN Server の SSL 証明書の CN の値がクライアント側で指定するホスト名と一致し、かつその証明書が信頼されている必要があります。詳しくは Microsoft 社のドキュメントを参照してください。\n指定された CN の値を持つ新しい SSL 証明書 (自己署名証明書) を生成して VPN Server の現在の証明書と置換するためには、ServerCertRegenerate コマンドを使用してください。この場合は、当該証明書を SSTP VPN クライアントのコンピュータの信頼されるルート証明書として登録する必要があります。このような手間をかけたくない場合は、代わりに VeriSign や GlobalSign 社などの市販の証明書業者の SSL 証明書の取得を検討してください。\n\nMicrosoft SSTP VPN 互換サーバー機能で仮想 HUB に接続する場合のユーザー名の指定方法、およびデフォルト仮想 HUB の選択規則は、IPsec サーバー機能と同様です。詳しくは IPsecEnable コマンドのヘルプを参照してください。\n\nこのコマンドを実行するには、VPN Server の管理者権限が必要です。\nこのコマンドは、VPN Bridge では実行できません。\nこのコマンドは、クラスタとして動作している VPN Server の仮想 HUB では実行できません。
 CMD_SstpEnable_Args		SstpEnable [yes|no]
 CMD_SstpEnable_[yes|no]	Microsoft SSTP VPN 互換サーバー機能を有効にする場合は yes、無効にする場合は no を指定します。
 CMD_SstpEnable_Prompt_[yes|no]	SSTP VPN 互換サーバー機能を有効化 (yes / no): 
@@ -6241,7 +6247,7 @@ CMD_SstpGet_Args		SstpGet
 
 # ServerCertRegenerate コマンド
 CMD_ServerCertRegenerate	指定された CN (Common Name) を持つ自己署名証明書を新たに作成し VPN Server に登録
-CMD_ServerCertRegenerate_Help	SoftEther VPN Server の SSL-VPN 機能で提示されるサーバー証明書を、新たに作成する証明書に置き換えます。新たな証明書は自己署名証明書として生成され、CN (Common Name) の値を任意の文字列に設定することができます。\n\nこのコマンドは、Microsoft SSTP VPN 互換サーバー機能を使用しようとする場合に便利です。なぜならば、SSTP VPN クライアント (Windows Vista / 7 / 8 / RT に標準搭載) は接続先の VPN Server の提示する SSL 証明書の CN (Common Name) の値が接続先として指定されているホスト名文字列と完全に一致するかどうかを検証し、もし一致しない場合は接続をキャンセルするためです。\n詳しくは SstpEnable コマンドのヘルプを参照してください。\n\nこのコマンドは、既存の VPN Server の SSL 証明書を削除します。ServerCertGet コマンドおよび ServerKeyGet コマンドを用いて、現在の証明書と秘密鍵をバックアップしておくことを推奨します。\n\nこのコマンドを実行するには、VPN Server の管理者権限が必要です。\nこのコマンドは、VPN Bridge では実行できません。
+CMD_ServerCertRegenerate_Help	SoftEther VPN Server の SSL-VPN 機能で提示されるサーバー証明書を、新たに作成する証明書に置き換えます。新たな証明書は自己署名証明書として生成され、CN (Common Name) の値を任意の文字列に設定することができます。\n\nこのコマンドは、Microsoft SSTP VPN 互換サーバー機能を使用しようとする場合に便利です。なぜならば、SSTP VPN クライアント (Windows Vista / 7 / 8 / RT / 10 に標準搭載) は接続先の VPN Server の提示する SSL 証明書の CN (Common Name) の値が接続先として指定されているホスト名文字列と完全に一致するかどうかを検証し、もし一致しない場合は接続をキャンセルするためです。\n詳しくは SstpEnable コマンドのヘルプを参照してください。\n\nこのコマンドは、既存の VPN Server の SSL 証明書を削除します。ServerCertGet コマンドおよび ServerKeyGet コマンドを用いて、現在の証明書と秘密鍵をバックアップしておくことを推奨します。\n\nこのコマンドを実行するには、VPN Server の管理者権限が必要です。\nこのコマンドは、VPN Bridge では実行できません。
 CMD_ServerCertRegenerate_Args	ServerCertRegenerate [CN]
 CMD_ServerCertRegenerate_[CN]	新たに生成する自己署名証明書の Common Name (CN) の値を指定します。
 CMD_ServerCertRegenerate_Prompt_CN	Common Name (CN) の値: 
@@ -7037,6 +7043,8 @@ SW_WEB_ERROR_MSG							VPN Client の Web インストーラの生成に失敗�
 SW_INSTALLER_CACHE_IS_NOT_SIGNED			現在のコンピュータにインストールされている SoftEther VPN Client は、SoftEther VPN Project の有効な Authenticode デジタル証明書で署名されたパッケージからインストールされていません。\r\nカスタマイズされたバージョンのインストーラからインストールされた可能性があります。\r\nたとえば、「簡易インストーラ作成キット」によってカスタマイズされたインストーラを用いてインストールされた可能性があります。\r\n\r\nこのままの状態で Web インストーラを作成すると、作成したインストーラをロードしようとした際にセキュリティの警告メッセージが表示されます。\r\n警告メッセージを表示しないようにするためには、一端 Web インストーラの作成をキャンセルし、ソフトイーサ社の Web サイトから最新の SoftEther VPN Client パッケージをダウンロードして再インストールしてから再度 Web インストーラを作成してください。\r\n\r\nこのまま続行しますか?
 SW_FILE_NOT_FOUNT							ファイル "%s" が見つかりません。
 SW_WEB_FINISHED								生成された Web インストーラを格納したファイル "%s" を保存しました。\r\n\r\nこの ZIP ファイルを展開し、中身のファイルを Web サーバーに設置して HTML ファイルや inf ファイル内の URL を適切に書き換えてください。\r\n\r\nWeb インストーラの配置方法に関する説明は ZIP ファイル内に記載されています。
+
+SW_VG_CONFIRM_MSG							SoftEther VPN Client に組み込まれた VPN Gate P2P 中継機能プラグインモジュール をインストールし有効化します。よろしいですか?\r\n\r\n本プラグインは、政府の検閲用ファイアウォールを回避するための通信の安定化を実現します。しかしながら、VPN Gate のためのネットワーク帯域の消費量が増加します。したがって、モバイル回線において VPN Gate 機能を使用することは推奨されていません。\r\n\r\n政府の検閲用ファイアウォールを回避する目的で暗号化された通信を行うことは、いくつかの国および地域では禁止されています。そのような場合は、VPN Gate 機能をコンピュータで使用してはいけません。VPN Gate は専ら日本国内における使用を想定し開発されています。VPN Gate は学術目的の研究プロジェクトです。VPN Gate は日本国の法令に基づいて提供されます。その他の国の法律については、VPN Gate Project は一切関知しておりません。本ソフトウェアおよびサービスを使用するにあたり、ユーザーはユーザー自身の責任において、適用されるすべての法令を遵守しなければなりません。使用場所が日本国内または国外のいずれであるかに係わらず、本ソフトウェアおよびサービスを使用したことによるすべての損害および責任はユーザーが負うこととなります。
 
 
 

@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -126,6 +126,89 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
+// Delete garbage inf files
+void SuDeleteGarbageInfs()
+{
+	void *wow;
+
+	wow = MsDisableWow64FileSystemRedirection();
+
+	SuDeleteGarbageInfsInner();
+
+	MsRestoreWow64FileSystemRedirection(wow);
+}
+void SuDeleteGarbageInfsInner()
+{
+	char *base_key_name = "DRIVERS\\DriverDatabase\\DriverPackages";
+	TOKEN_LIST *keys;
+	HINSTANCE hSetupApiDll = NULL;
+	BOOL (WINAPI *_SetupUninstallOEMInfA)(PCSTR, DWORD, PVOID) = NULL;
+
+	if (MsIsWindows10() == false)
+	{
+		return;
+	}
+
+	hSetupApiDll = LoadLibraryA("setupapi.dll");
+	if (hSetupApiDll == NULL)
+	{
+		return;
+	}
+
+	_SetupUninstallOEMInfA =
+		(UINT (__stdcall *)(PCSTR,DWORD,PVOID))
+		GetProcAddress(hSetupApiDll, "SetupUninstallOEMInfA");
+
+	if (_SetupUninstallOEMInfA != NULL)
+	{
+		keys = MsRegEnumKeyEx2(REG_LOCAL_MACHINE, base_key_name, false, true);
+
+		if (keys != NULL)
+		{
+			char full_key[MAX_PATH];
+			UINT i;
+
+			for (i = 0;i < keys->NumTokens;i++)
+			{
+				char *oem_name, *inf_name, *provider;
+
+				Format(full_key, sizeof(full_key), "%s\\%s", base_key_name, keys->Token[i]);
+
+				oem_name = MsRegReadStrEx2(REG_LOCAL_MACHINE, full_key, "", false, true);
+				inf_name = MsRegReadStrEx2(REG_LOCAL_MACHINE, full_key, "InfName", false, true);
+				provider = MsRegReadStrEx2(REG_LOCAL_MACHINE, full_key, "Provider", false, true);
+
+				if (IsEmptyStr(oem_name) == false && IsEmptyStr(inf_name) == false)
+				{
+					if (StartWith(oem_name, "oem"))
+					{
+						if (StartWith(inf_name, "selow"))
+						{
+							if (InStr(provider, "softether"))
+							{
+								Debug("Delete OEM INF %s (%s): %u\n",
+									oem_name, inf_name,
+									_SetupUninstallOEMInfA(oem_name, 0x00000001, NULL));
+							}
+						}
+					}
+				}
+
+				Free(oem_name);
+				Free(inf_name);
+				Free(provider);
+			}
+
+			FreeToken(keys);
+		}
+	}
+
+	if (hSetupApiDll != NULL)
+	{
+		FreeLibrary(hSetupApiDll);
+	}
+}
+
 // Install the driver
 bool SuInstallDriver(bool force)
 {
@@ -175,11 +258,13 @@ bool SuInstallDriverInner(bool force)
 		char *path;
 
 		// Read the current version from the registry
-		current_sl_ver = MsRegReadIntEx2(REG_LOCAL_MACHINE, SL_REG_KEY_NAME, SL_REG_VER_VALUE, false, true);
+		current_sl_ver = MsRegReadIntEx2(REG_LOCAL_MACHINE, SL_REG_KEY_NAME,
+			(MsIsWindows10() ? SL_REG_VER_VALUE_WIN10 : SL_REG_VER_VALUE),
+			false, true);
 
 		path = MsRegReadStrEx2(REG_LOCAL_MACHINE, SL_REG_KEY_NAME, "ImagePath", false, true);
 
-		if (IsEmptyStr(path))
+		if (IsEmptyStr(path) || IsFileExists(path) == false || MsIsServiceInstalled(SL_PROTOCOL_NAME) == false)
 		{
 			current_sl_ver = 0;
 		}
@@ -195,12 +280,34 @@ bool SuInstallDriverInner(bool force)
 	}
 
 	// Copy necessary files to a temporary directory
-	UniFormat(src_sys, sizeof(src_sys), L"|SeLow_%S.sys", cpu_type);
-	UniFormat(src_cat, sizeof(src_cat), L"|inf\\selow_%S\\inf.cat", cpu_type);
-	UniFormat(src_inf, sizeof(src_inf), L"|inf\\selow_%S\\SeLow_%S.inf", cpu_type, cpu_type);
+	UniFormat(src_sys, sizeof(src_sys), L"|DriverPackages\\%S\\%S\\SeLow_%S.sys",
+		(MsIsWindows10() ? "SeLow_Win10" : "SeLow_Win8"),
+		cpu_type, cpu_type);
+	if (MsIsWindows8() == false)
+	{
+		// Windows Vista and Windows 7 uses SHA-1 catalog files
+		UniFormat(src_cat, sizeof(src_cat), L"|DriverPackages\\SeLow_Win8\\%S\\inf.cat", cpu_type);
+	}
+	else
+	{
+		// Windows 8 or above uses SHA-256 catalog files
+		UniFormat(src_cat, sizeof(src_cat), L"|DriverPackages\\SeLow_Win8\\%S\\inf2.cat", cpu_type);
+
+		if (MsIsWindows10())
+		{
+			// Windows 10 uses WHQL catalog files
+			UniFormat(src_cat, sizeof(src_cat), L"|DriverPackages\\SeLow_Win10\\%S\\SeLow_Win10_%S.cat", cpu_type, cpu_type);
+		}
+	}
+	UniFormat(src_inf, sizeof(src_inf), L"|DriverPackages\\%S\\%S\\SeLow_%S.inf",
+		(MsIsWindows10() ? "SeLow_Win10" : "SeLow_Win8"),
+		cpu_type, cpu_type);
 
 	UniFormat(dst_sys, sizeof(dst_cat), L"%s\\SeLow_%S.sys", tmp_dir, cpu_type);
-	UniFormat(dst_cat, sizeof(dst_cat), L"%s\\inf_selow.cat", tmp_dir);
+	UniFormat(dst_cat, sizeof(dst_cat), L"%s\\SeLow_%S_%S.cat", tmp_dir,
+		(MsIsWindows10() ? "Win10" : "Win8"),
+		cpu_type);
+
 	UniFormat(dst_inf, sizeof(dst_inf), L"%s\\SeLow_%S.inf", tmp_dir, cpu_type);
 
 	if (FileCopyW(src_sys, dst_sys) &&
@@ -210,6 +317,21 @@ bool SuInstallDriverInner(bool force)
 		NO_WARNING *nw;
 
 		nw = MsInitNoWarningEx(SL_USER_AUTO_PUSH_TIMER);
+
+		if (MsIsWindows10())
+		{
+			if (MsIsServiceInstalled(SL_PROTOCOL_NAME) == false && MsIsServiceRunning(SL_PROTOCOL_NAME) == false)
+			{
+				// On Windows 10, if there are no SwLow service installed, then uinstall the protocol driver first.
+				// TODO: currently do nothing. On some versions of Windows 10 beta builds it is necessary to do something...
+			}
+		}
+
+		if (MsIsWindows10())
+		{
+			// Delete garbage INFs
+			SuDeleteGarbageInfs();
+		}
 
 		// Call the installer
 		if (InstallNdisProtocolDriver(dst_inf, L"SeLow", SL_USER_INSTALL_LOCK_TIMEOUT) == false)
@@ -226,7 +348,9 @@ bool SuInstallDriverInner(bool force)
 			ret = true;
 
 			// Write the version number into the registry
-			MsRegWriteIntEx2(REG_LOCAL_MACHINE, SL_REG_KEY_NAME, SL_REG_VER_VALUE, SL_VER, false, true);
+			MsRegWriteIntEx2(REG_LOCAL_MACHINE, SL_REG_KEY_NAME,
+				(MsIsWindows10() ? SL_REG_VER_VALUE_WIN10 : SL_REG_VER_VALUE),
+				SL_VER, false, true);
 
 			// Set to automatic startup
 			MsRegWriteIntEx2(REG_LOCAL_MACHINE, SL_REG_KEY_NAME, "Start", SERVICE_SYSTEM_START, false, true);
@@ -738,6 +862,7 @@ SU *SuInitEx(UINT wait_for_bind_complete_tick)
 	UINT read_size;
 	bool flag = false;
 	UINT64 giveup_tick = 0;
+	static bool flag2 = false; // flag2 must be global
 
 	if (SuIsSupportedOs(false) == false)
 	{
@@ -761,6 +886,19 @@ LABEL_RETRY:
 			if (MsStartService(SL_PROTOCOL_NAME) == false)
 			{
 				Debug("MsStartService(%s) Failed.\n", SL_PROTOCOL_NAME);
+
+				if (MsIsWindows10())
+				{
+					if (flag2 == false)
+					{
+						flag2 = true;
+
+						if (SuInstallDriver(true))
+						{
+							goto LABEL_RETRY;
+						}
+					}
+				}
 			}
 			else
 			{

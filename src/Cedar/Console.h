@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -160,6 +160,7 @@ struct CONSOLE
 	char *(*ReadPassword)(CONSOLE *c, wchar_t *prompt);		// Function to read the password
 	bool (*Write)(CONSOLE *c, wchar_t *str);				// Function to write a string
 	UINT (*GetWidth)(CONSOLE *c);							// Get the width of the screen
+	bool ProgrammingMode;									// Programming Mode
 };
 
 // Local console parameters

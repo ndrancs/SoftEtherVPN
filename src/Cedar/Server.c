@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -117,6 +117,7 @@ static SERVER *server = NULL;
 static LOCK *server_lock = NULL;
 char *SERVER_CONFIG_FILE_NAME = "@vpn_server.config";
 char *SERVER_CONFIG_FILE_NAME_IN_CLIENT = "@vpn_gate_svc.config";
+char *SERVER_CONFIG_FILE_NAME_IN_CLIENT_RELAY = "@vpn_gate_relay.config";
 char *BRIDGE_CONFIG_FILE_NAME = "@vpn_bridge.config";
 char *SERVER_CONFIG_TEMPLATE_NAME = "@vpn_server_template.config";
 char *BRIDGE_CONFIG_TEMPLATE_NAME = "@vpn_server_template.config";
@@ -260,6 +261,7 @@ UINT SiDebug(SERVER *s, RPC_TEST *ret, UINT i, char *str)
 		{10, "Get VgsMessageDisplayed Flag", "", SiDebugProcGetVgsMessageDisplayedValue},
 		{11, "Set VgsMessageDisplayed Flag", "", SiDebugProcSetVgsMessageDisplayedValue},
 		{12, "Get the current TCP send queue length", "", SiDebugProcGetCurrentTcpSendQueueLength},
+		{13, "Get the current GetIP thread count", "", SiDebugProcGetCurrentGetIPThreadCount},
 	};
 	UINT num_proc_list = sizeof(proc_list) / sizeof(proc_list[0]);
 	UINT j;
@@ -475,6 +477,25 @@ UINT SiDebugProcGetCurrentTcpSendQueueLength(SERVER *s, char *in_str, char *ret_
 		"QueueBudgetConsuming = %s\n"
 		"FifoBudgetConsuming  = %s\n",
 		tmp1, tmp2, tmp3);
+
+	return ERR_NO_ERROR;
+}
+UINT SiDebugProcGetCurrentGetIPThreadCount(SERVER *s, char *in_str, char *ret_str, UINT ret_str_size)
+{
+	char tmp1[64], tmp2[64];
+	// Validate arguments
+	if (s == NULL || in_str == NULL || ret_str == NULL)
+	{
+		return ERR_INVALID_PARAMETER;
+	}
+
+	ToStr3(tmp1, 0, GetCurrentGetIpThreadNum());
+	ToStr3(tmp2, 0, GetGetIpThreadMaxNum());
+
+	Format(ret_str, 0, 
+		"Current threads = %s\n"
+		"Quota           = %s\n",
+		tmp1, tmp2);
 
 	return ERR_NO_ERROR;
 }
@@ -4081,6 +4102,10 @@ void SiLoadHubOptionCfg(FOLDER *f, HUB_OPTION *o)
 	o->DisableCheckMacOnLocalBridge = CfgGetBool(f, "DisableCheckMacOnLocalBridge");
 	o->DisableCorrectIpOffloadChecksum = CfgGetBool(f, "DisableCorrectIpOffloadChecksum");
 	o->SuppressClientUpdateNotification = CfgGetBool(f, "SuppressClientUpdateNotification");
+	o->AssignVLanIdByRadiusAttribute = CfgGetBool(f, "AssignVLanIdByRadiusAttribute");
+	o->SecureNAT_RandomizeAssignIp = CfgGetBool(f, "SecureNAT_RandomizeAssignIp");
+	o->DetectDormantSessionInterval = CfgGetInt(f, "DetectDormantSessionInterval");
+	o->NoPhysicalIPOnPacketLog = CfgGetBool(f, "NoPhysicalIPOnPacketLog");
 
 	// Enabled by default
 	if (CfgIsItem(f, "ManageOnlyPrivateIP"))
@@ -4156,6 +4181,10 @@ void SiWriteHubOptionCfg(FOLDER *f, HUB_OPTION *o)
 	CfgAddBool(f, "DropBroadcastsInPrivacyFilterMode", o->DropBroadcastsInPrivacyFilterMode);
 	CfgAddBool(f, "DropArpInPrivacyFilterMode", o->DropArpInPrivacyFilterMode);
 	CfgAddBool(f, "SuppressClientUpdateNotification", o->SuppressClientUpdateNotification);
+	CfgAddBool(f, "AssignVLanIdByRadiusAttribute", o->AssignVLanIdByRadiusAttribute);
+	CfgAddBool(f, "SecureNAT_RandomizeAssignIp", o->SecureNAT_RandomizeAssignIp);
+	CfgAddBool(f, "NoPhysicalIPOnPacketLog", o->NoPhysicalIPOnPacketLog);
+	CfgAddInt(f, "DetectDormantSessionInterval", o->DetectDormantSessionInterval);
 	CfgAddBool(f, "NoLookBPDUBridgeId", o->NoLookBPDUBridgeId);
 	CfgAddInt(f, "AdjustTcpMssValue", o->AdjustTcpMssValue);
 	CfgAddBool(f, "DisableAdjustTcpMss", o->DisableAdjustTcpMss);
@@ -5748,6 +5777,7 @@ void SiLoadServerCfg(SERVER *s, FOLDER *f)
 	bool cluster_allowed = false;
 	UINT num_connections_per_ip = 0;
 	FOLDER *params_folder;
+	UINT i;
 	// Validate arguments
 	if (s == NULL || f == NULL)
 	{
@@ -5763,6 +5793,16 @@ void SiLoadServerCfg(SERVER *s, FOLDER *f)
 	else
 	{
 		s->AutoSaveConfigSpan = MAKESURE(s->AutoSaveConfigSpan, SERVER_FILE_SAVE_INTERVAL_MIN, SERVER_FILE_SAVE_INTERVAL_MAX);
+	}
+
+	i = CfgGetInt(f, "MaxConcurrentDnsClientThreads");
+	if (i != 0)
+	{
+		SetGetIpThreadMaxNum(i);
+	}
+	else
+	{
+		SetGetIpThreadMaxNum(DEFAULT_GETIP_THREAD_MAX_NUM);
 	}
 
 	s->DontBackupConfig = CfgGetBool(f, "DontBackupConfig");
@@ -5899,6 +5939,16 @@ void SiLoadServerCfg(SERVER *s, FOLDER *f)
 
 		// Disable the OpenVPN server function
 		s->DisableOpenVPNServer = CfgGetBool(f, "DisableOpenVPNServer");
+
+		// OpenVPN Default Option String
+		if (CfgGetStr(f, "OpenVPNDefaultClientOption", tmp, sizeof(tmp)))
+		{
+			if (IsEmptyStr(tmp) == false)
+			{
+				StrCpy(c->OpenVPNDefaultClientOption,
+					sizeof(c->OpenVPNDefaultClientOption), tmp);
+			}
+		}
 
 		// Disable the NAT-traversal feature
 		s->DisableNatTraversal = CfgGetBool(f, "DisableNatTraversal");
@@ -6094,6 +6144,9 @@ void SiLoadServerCfg(SERVER *s, FOLDER *f)
 
 		// Disable session reconnect
 		SetGlobalServerFlag(GSF_DISABLE_SESSION_RECONNECT, CfgGetBool(f, "DisableSessionReconnect"));
+
+		// AcceptOnlyTls
+		c->AcceptOnlyTls = CfgGetBool(f, "AcceptOnlyTls");
 	}
 	Unlock(c->lock);
 
@@ -6186,6 +6239,8 @@ void SiWriteServerCfg(FOLDER *f, SERVER *s)
 	{
 		return;
 	}
+
+	CfgAddInt(f, "MaxConcurrentDnsClientThreads", GetGetIpThreadMaxNum());
 
 	CfgAddInt(f, "CurrentBuild", s->Cedar->Build);
 
@@ -6288,6 +6343,8 @@ void SiWriteServerCfg(FOLDER *f, SERVER *s)
 				CfgAddBool(f, "DisableOpenVPNServer", s->DisableOpenVPNServer);
 			}
 		}
+
+		CfgAddStr(f, "OpenVPNDefaultClientOption", c->OpenVPNDefaultClientOption);
 
 		if (c->Bridge == false)
 		{
@@ -6397,6 +6454,8 @@ void SiWriteServerCfg(FOLDER *f, SERVER *s)
 
 		CfgAddBool(f, "DisableGetHostNameWhenAcceptTcp", s->DisableGetHostNameWhenAcceptTcp);
 		CfgAddBool(f, "DisableCoreDumpOnUnix", s->DisableCoreDumpOnUnix);
+
+		CfgAddBool(f, "AcceptOnlyTls", c->AcceptOnlyTls);
 
 		// Disable session reconnect
 		CfgAddBool(f, "DisableSessionReconnect", GetGlobalServerFlag(GSF_DISABLE_SESSION_RECONNECT));
@@ -7426,7 +7485,11 @@ void SiCalledUpdateHub(SERVER *s, PACK *p)
 	o.DropBroadcastsInPrivacyFilterMode = PackGetBool(p, "DropBroadcastsInPrivacyFilterMode");
 	o.DropArpInPrivacyFilterMode = PackGetBool(p, "DropArpInPrivacyFilterMode");
 	o.SuppressClientUpdateNotification = PackGetBool(p, "SuppressClientUpdateNotification");
+	o.AssignVLanIdByRadiusAttribute = PackGetBool(p, "AssignVLanIdByRadiusAttribute");
+	o.SecureNAT_RandomizeAssignIp = PackGetBool(p, "SecureNAT_RandomizeAssignIp");
+	o.DetectDormantSessionInterval = PackGetInt(p, "DetectDormantSessionInterval");
 	o.VlanTypeId = PackGetInt(p, "VlanTypeId");
+	o.NoPhysicalIPOnPacketLog = PackGetBool(p, "NoPhysicalIPOnPacketLog");
 	if (o.VlanTypeId == 0)
 	{
 		o.VlanTypeId = MAC_PROTO_TAGVLAN;
@@ -9265,7 +9328,11 @@ void SiPackAddCreateHub(PACK *p, HUB *h)
 	PackAddBool(p, "DropBroadcastsInPrivacyFilterMode", h->Option->DropBroadcastsInPrivacyFilterMode);
 	PackAddBool(p, "DropArpInPrivacyFilterMode", h->Option->DropArpInPrivacyFilterMode);
 	PackAddBool(p, "SuppressClientUpdateNotification", h->Option->SuppressClientUpdateNotification);
+	PackAddBool(p, "AssignVLanIdByRadiusAttribute", h->Option->AssignVLanIdByRadiusAttribute);
 	PackAddInt(p, "ClientMinimumRequiredBuild", h->Option->ClientMinimumRequiredBuild);
+	PackAddBool(p, "SecureNAT_RandomizeAssignIp", h->Option->SecureNAT_RandomizeAssignIp);
+	PackAddBool(p, "NoPhysicalIPOnPacketLog", h->Option->NoPhysicalIPOnPacketLog);
+	PackAddInt(p, "DetectDormantSessionInterval", h->Option->DetectDormantSessionInterval);
 	PackAddBool(p, "FixForDLinkBPDU", h->Option->FixForDLinkBPDU);
 	PackAddBool(p, "BroadcastLimiterStrictMode", h->Option->BroadcastLimiterStrictMode);
 	PackAddBool(p, "NoLookBPDUBridgeId", h->Option->NoLookBPDUBridgeId);
@@ -10797,14 +10864,16 @@ void SiUpdateCurrentRegion(CEDAR *c, char *region, bool force_update)
 // Create a server
 SERVER *SiNewServer(bool bridge)
 {
-	return SiNewServerEx(bridge, false);
+	return SiNewServerEx(bridge, false, false);
 }
-SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server)
+SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_server)
 {
 	SERVER *s;
 	LISTENER *inproc;
 	LISTENER *azure;
 	LISTENER *rudp;
+
+	SetGetIpThreadMaxNum(DEFAULT_GETIP_THREAD_MAX_NUM);
 
 	s = ZeroMalloc(sizeof(SERVER));
 

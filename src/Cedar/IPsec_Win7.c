@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -109,7 +109,7 @@
 
 
 // IPsec_Win7.c
-// Initialize the helper module for Windows 7 / Windows 8 / Windows Vista / Windows Server 2008 / Windows Server 2008 R2 / Windows Server 2012
+// Initialize the helper module for Windows 7 / Windows 8 / Windows Vista / Windows Server 2008 / Windows Server 2008 R2 / Windows Server 2012 / Windows 10
 
 #include <GlobalConst.h>
 
@@ -367,10 +367,19 @@ bool IPsecWin7InitDriverInner()
 
 	if (install_driver)
 	{
-		char *src_filename = IPSEC_WIN7_SRC_SYS_X86;
-		if (MsIsX64())
+		char src_filename[MAX_PATH];
+
+		if (MsIsWindows10() == false)
 		{
-			src_filename = IPSEC_WIN7_SRC_SYS_X64;
+			Format(src_filename, sizeof(src_filename),
+				"|DriverPackages\\Wfp\\%s\\pxwfp_%s.sys",
+				(MsIsX64() ? "x64" : "x86"), (MsIsX64() ? "x64" : "x86"));
+		}
+		else
+		{
+			Format(src_filename, sizeof(src_filename),
+				"|DriverPackages\\Wfp_Win10\\%s\\pxwfp_%s.sys",
+				(MsIsX64() ? "x64" : "x86"), (MsIsX64() ? "x64" : "x86"));
 		}
 
 		// Copy the driver
@@ -467,13 +476,16 @@ bool IPsecWin7InitDriverInner()
 // Write the build number of the current driver
 void SetCurrentIPsecWin7DriverBuild()
 {
-	MsRegWriteInt(REG_LOCAL_MACHINE, IPSEC_WIN7_DRIVER_REGKEY, IPSEC_WIN7_DRIVER_BUILDNUMBER, CEDAR_BUILD);
+	MsRegWriteInt(REG_LOCAL_MACHINE, IPSEC_WIN7_DRIVER_REGKEY,
+		(MsIsWindows10() ? IPSEC_WIN7_DRIVER_BUILDNUMBER_WIN10 : IPSEC_WIN7_DRIVER_BUILDNUMBER),
+		CEDAR_BUILD);
 }
 
 // Get the build number of the current driver
 UINT GetCurrentIPsecWin7DriverBuild()
 {
-	return MsRegReadInt(REG_LOCAL_MACHINE, IPSEC_WIN7_DRIVER_REGKEY, IPSEC_WIN7_DRIVER_BUILDNUMBER);
+	return MsRegReadInt(REG_LOCAL_MACHINE, IPSEC_WIN7_DRIVER_REGKEY,
+		(MsIsWindows10() ? IPSEC_WIN7_DRIVER_BUILDNUMBER_WIN10 : IPSEC_WIN7_DRIVER_BUILDNUMBER));
 }
 
 // Initialization of the API

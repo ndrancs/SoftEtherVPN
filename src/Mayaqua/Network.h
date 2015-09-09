@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -146,6 +146,13 @@ struct DYN_VALUE
 #define	UDP_MAX_MSG_SIZE_DEFAULT	65507
 
 #define	MAX_NUM_IGNORE_ERRORS		1024
+
+#ifndef	USE_STRATEGY_LOW_MEMORY
+#define	DEFAULT_GETIP_THREAD_MAX_NUM		512
+#else	// USE_STRATEGY_LOW_MEMORY
+#define	DEFAULT_GETIP_THREAD_MAX_NUM		64
+#endif	// USE_STRATEGY_LOW_MEMORY
+
 
 // SSL logging function
 //#define	ENABLE_SSL_LOGGING
@@ -305,6 +312,7 @@ struct SOCK
 	IP Reverse_MyServerGlobalIp;	// Self global IP address when using the reverse socket
 	UINT Reverse_MyServerPort;		// Self port number when using the reverse socket
 	UCHAR Ssl_Init_Async_SendAlert[2];	// Initial state of SSL send_alert
+	bool AcceptOnlyTls;			// Accept only TLS (disable SSLv3)
 
 #ifdef	ENABLE_SSL_LOGGING
 	// SSL Logging (for debug)
@@ -747,15 +755,14 @@ struct RUDP_SESSION
 
 // Related to processing to get the IP address of the NAT-T server
 #define	UDP_NAT_T_GET_IP_INTERVAL			DYN32(UDP_NAT_T_GET_IP_INTERVAL, (5 * 1000))		// IP address acquisition interval of NAT-T server (before success)
+#define	UDP_NAT_T_GET_IP_INTERVAL_MAX		DYN32(UDP_NAT_T_GET_IP_INTERVAL, (150 * 1000))		// IP address acquisition interval of NAT-T server (before success)
 #define	UDP_NAT_T_GET_IP_INTERVAL_AFTER		DYN32(UDP_NAT_T_GET_IP_INTERVAL_AFTER, (5 * 60 * 1000))	// IP address acquisition interval of NAT-T server (after success)
 
 // Related to process to get the private IP address of itself with making a TCP connection to the NAT-T server
-#define	UDP_NAT_T_GET_PRIVATE_IP_TCP_SERVER		"get-my-ip.nat-traversal.softether-network.net."
-#define	UDP_NAT_T_GET_PRIVATE_IP_TCP_SERVER_ALT	"get-my-ip.nat-traversal.uxcom.jp."
+#define	UDP_NAT_T_GET_PRIVATE_IP_TCP_SERVER		"www.msftncsi.com."
 
-#define	UDP_NAT_T_PORT_FOR_TCP_1			992
-#define	UDP_NAT_T_PORT_FOR_TCP_2			80
-#define	UDP_NAT_T_PORT_FOR_TCP_3			443
+#define	UDP_NAT_T_PORT_FOR_TCP_1			80
+#define	UDP_NAT_T_PORT_FOR_TCP_2			443
 
 #define	UDP_NAT_TRAVERSAL_VERSION			1
 
@@ -1093,7 +1100,8 @@ void *InitWaitUntilHostIPAddressChanged();
 void FreeWaitUntilHostIPAddressChanged(void *p);
 void WaitUntilHostIPAddressChanged(void *p, EVENT *event, UINT timeout, UINT ip_check_interval);
 UINT GetHostIPAddressHash32();
-bool GetMyPrivateIP(IP *ip);
+bool GetMyPrivateIP(IP *ip, bool from_vg);
+char *GetRandHostNameForGetMyPrivateIP();
 UINT GenRandInterval(UINT min, UINT max);
 void RUDPProcess_NatT_Recv(RUDP_STACK *r, UDPPACKET *udp);
 void RUDPDo_NatT_Interrupt(RUDP_STACK *r);
@@ -1315,6 +1323,7 @@ SOCK *NewUDP4(UINT port, IP *ip);
 SOCK *NewUDP6(UINT port, IP *ip);
 SOCK *NewUDPEx2Rand(bool ipv6, IP *ip, void *rand_seed, UINT rand_seed_size, UINT num_retry);
 SOCK *NewUDPEx2RandMachineAndExePath(bool ipv6, IP *ip, UINT num_retry, UCHAR rand_port_id);
+UINT GetNewAvailableUdpPortRand();
 UINT NewRandPortByMachineAndExePath(UINT start_port, UINT end_port, UINT additional_int);
 void DisableUDPChecksum(SOCK *s);
 UINT SendTo(SOCK *sock, IP *dest_addr, UINT dest_port, void *data, UINT size);
@@ -1417,6 +1426,7 @@ void RouteToStr(char *str, UINT str_size, ROUTE_ENTRY *e);
 void DebugPrintRoute(ROUTE_ENTRY *e);
 void DebugPrintRouteTable(ROUTE_TABLE *r);
 bool IsIPv6LocalNetworkAddress(IP *ip);
+UINT GetNumWaitThread();
 
 #ifdef	ENABLE_SSL_LOGGING
 void SockEnableSslLogging(SOCK *s);
@@ -1483,6 +1493,8 @@ void IPNot4(IP *dst, IP *a);
 void IPOr4(IP *dst, IP *a, IP *b);
 void IPAnd4(IP *dst, IP *a, IP *b);
 bool IsInSameNetwork4(IP *a1, IP *a2, IP *subnet);
+bool IsInSameNetwork4Standard(IP *a1, IP *a2);
+bool IsInSameLocalNetworkToMe4(IP *a);
 
 bool ParseIpAndSubnetMask4(char *src, UINT *ip, UINT *mask);
 bool ParseIpAndSubnetMask6(char *src, IP *ip, IP *mask);
@@ -1538,6 +1550,7 @@ bool IsMyIPAddress(IP *ip);
 void FreeHostIPAddressList(LIST *o);
 void AddHostIPAddressToList(LIST *o, IP *ip);
 int CmpIpAddressList(void *p1, void *p2);
+UINT64 GetHostIPAddressListHash();
 
 UDPLISTENER *NewUdpListener(UDPLISTENER_RECV_PROC *recv_proc, void *param);
 void UdpListenerThread(THREAD *thread, void *param);
@@ -1598,8 +1611,10 @@ bool SslBioSync(SSL_BIO *b, bool sync_send, bool sync_recv);
 void SetCurrentGlobalIP(IP *ip, bool ipv6);
 bool GetCurrentGlobalIP(IP *ip, bool ipv6);
 void GetCurrentGlobalIPGuess(IP *ip, bool ipv6);
+bool IsIPAddressInSameLocalNetwork(IP *a);
 
 bool IsIPPrivate(IP *ip);
+bool IsIPLocalOrPrivate(IP *ip);
 bool IsIPMyHost(IP *ip);
 void LoadPrivateIPFile();
 bool IsOnPrivateIPFile(UINT ip);
@@ -1629,6 +1644,11 @@ void QueryIpThreadMain(THREAD *thread, void *param);
 QUERYIPTHREAD *NewQueryIpThread(char *hostname, UINT interval_last_ok, UINT interval_last_ng);
 bool GetQueryIpThreadResult(QUERYIPTHREAD *t, IP *ip);
 void FreeQueryIpThread(QUERYIPTHREAD *t);
+
+void SetGetIpThreadMaxNum(UINT num);
+UINT GetGetIpThreadMaxNum();
+UINT GetCurrentGetIpThreadNum();
+
 
 
 bool IsIpInStrList(IP *ip, char *ip_list);

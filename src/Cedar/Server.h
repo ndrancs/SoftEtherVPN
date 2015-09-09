@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -472,7 +472,7 @@ struct SERVER_HUB_CREATE_HISTORY
 
 // Function prototype declaration
 SERVER *SiNewServer(bool bridge);
-SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server);
+SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_server);
 void SiReleaseServer(SERVER *s);
 void SiCleanupServer(SERVER *s);
 void StStartServer(bool bridge);
@@ -678,6 +678,7 @@ UINT SiDebugProcSetIPsecMessageDisplayedValue(SERVER *s, char *in_str, char *ret
 UINT SiDebugProcGetVgsMessageDisplayedValue(SERVER *s, char *in_str, char *ret_str, UINT ret_str_size);
 UINT SiDebugProcSetVgsMessageDisplayedValue(SERVER *s, char *in_str, char *ret_str, UINT ret_str_size);
 UINT SiDebugProcGetCurrentTcpSendQueueLength(SERVER *s, char *in_str, char *ret_str, UINT ret_str_size);
+UINT SiDebugProcGetCurrentGetIPThreadCount(SERVER *s, char *in_str, char *ret_str, UINT ret_str_size);
 
 typedef UINT (SI_DEBUG_PROC)(SERVER *s, char *in_str, char *ret_str, UINT ret_str_size);
 

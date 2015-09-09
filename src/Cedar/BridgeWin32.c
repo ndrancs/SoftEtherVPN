@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -1894,6 +1894,12 @@ bool IsPcdSupported()
 	UINT type;
 	OS_INFO *info = GetOsInfo();
 
+	if (MsIsWindows10())
+	{
+		// Windows 10 or later never supports PCD driver.
+		return false;
+	}
+
 	type = info->OsType;
 
 	if (OS_IS_WINDOWS_NT(type) == false)
@@ -1972,11 +1978,6 @@ HINSTANCE InstallPcdDriverInternal()
 			src_filename = BRIDGE_WIN32_PCD_SYS_X64;
 		}
 
-		if (MsIsIA64())
-		{
-			src_filename = BRIDGE_WIN32_PCD_SYS_IA64;
-		}
-
 		// Copy see.sys
 		if (FileCopy(src_filename, tmp) == false)
 		{
@@ -1994,10 +1995,6 @@ HINSTANCE InstallPcdDriverInternal()
 		if (MsIsX64())
 		{
 			dll_filename = BRIDGE_WIN32_PCD_DLL_X64;
-		}
-		else if (MsIsIA64())
-		{
-			dll_filename = BRIDGE_WIN32_PCD_DLL_IA64;
 		}
 	}
 

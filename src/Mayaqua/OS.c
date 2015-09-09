@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -200,11 +200,11 @@ char *OsTypeToStr(UINT type)
 	case OSTYPE_WINDOWS_10:
 		return "Windows 10\0\n";
 	case OSTYPE_WINDOWS_SERVER_10:
-		return "Windows Server 10\0\n";
+		return "Windows Server 2016\0\n";
 	case OSTYPE_WINDOWS_11:
-		return "Windows 11 or later\0\n";
+		return "Newer than Windows 10\0\n";
 	case OSTYPE_WINDOWS_SERVER_11:
-		return "Windows Server 11 or later\0\n";
+		return "Newer than Windows Server 2016\0\n";
 	case OSTYPE_UNIX_UNKNOWN:
 		return "UNIX System\0\n";
 	case OSTYPE_LINUX:

@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -130,6 +130,9 @@ struct PACKET_LOG
 	struct PKT *Packet;
 	char *SrcSessionName;
 	char *DestSessionName;
+	bool WritePhysicalIP;
+	char SrcPhysicalIP[64];
+	char DestPhysicalIP[64];
 	bool PurePacket;						// Packet not cloned
 	bool PurePacketNoPayload;				// Packet not cloned (without payload)
 	SESSION *SrcSession;

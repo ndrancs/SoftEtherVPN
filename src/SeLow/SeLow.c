@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -393,6 +393,7 @@ NTSTATUS SlDeviceOpenProc(DEVICE_OBJECT *device_object, IRP *irp)
 					p.fAllocateNetBuffer = true;
 					p.ContextSize = 32 + sizeof(UINT32) * 12;
 					p.DataSize = SL_MAX_PACKET_SIZE;
+					p.PoolTag = 'SETH';
 
 					f->NetBufferListPool = NdisAllocateNetBufferListPool(NULL, &p);
 
@@ -1705,7 +1706,7 @@ void *SlMalloc(UINT size)
 	}
 
 	// Allocate the non-paged memory
-	r = NdisAllocateMemoryWithTag(&p, size, 0);
+	r = NdisAllocateMemoryWithTag(&p, size, 'SETH');
 
 	if (NG(r))
 	{

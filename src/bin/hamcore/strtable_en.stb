@@ -210,6 +210,7 @@ ERR_144					Unacceptable operation. Use the VPN Gate Control Panel to change the
 ERR_145					Unacceptable operation. Use the VPN Gate Utility to modify the connection setting for VPN Gate Public VPN Relay Servers.
 ERR_146					The VPN Gate Service is running inside the VPN Client program. You cannot stop the VPN Gate Service on this screen. Use the VPN Client Manager to enable or disable the VPN Gate Service.
 ERR_147					This feature is not supported. It hasn't been implemented yet on the open-source version of SoftEther VPN.
+ERR_148					The VPN connection was disconnected because the system is being suspended.
 
 # Concerning licenses
 LICENSE_INFO_URL		https://selinks.org/?new_license
@@ -231,10 +232,10 @@ TCPOPT_NOT_ADMIN		Users without administrator privileges cannot use the TCP Opti
 
 
 # Windows Vista / Windows 7 / Windows 8 Optimization
-VISTA_MMCSS_MSG			Do you wish to optimize Windows Vista / Windows 7 / Windows 8 for playing multimedia files with VPN? (e.g. videos, audios and streaming)
-VISTA_MMCSS_MSG_2		Optimization for Windows Vista / Windows 7 / Windows 8 with VPN has already done.\r\nDo you wish to remote optimized configuration?
+VISTA_MMCSS_MSG			Do you wish to optimize Windows Vista / Windows 7 / Windows 8 / Windows 10 for playing multimedia files with VPN? (e.g. videos, audios and streaming)
+VISTA_MMCSS_MSG_2		Optimization for Windows Vista / Windows 7 / Windows 8 / Windows 10 with VPN has already done.\r\nDo you wish to remote optimized configuration?
 VISTA_MMCSS_MSG_3		You cannot use optimization in currently environment.
-VISTA_MMCSS_MSG_4		You must have administrator privileges for this function.\r\nPlease note that in Windows Vista / Windows 7 / Windows 8 you should use "Run as Administrators" to execute program.
+VISTA_MMCSS_MSG_4		You must have administrator privileges for this function.\r\nPlease note that in Windows Vista / Windows 7 / Windows 8 / Windows 10 you should use "Run as Administrators" to execute program.
 VISTA_MMCSS_MSG_5		Optimization is finished.
 VISTA_MMCSS_MSG_6		Optimization configuration is removed.
 
@@ -551,6 +552,10 @@ HUB_AO_DropBroadcastsInPrivacyFilterMode	Drop broadcasting packets if the both s
 HUB_AO_DropArpInPrivacyFilterMode			Drop ARP packets if the both source and destination session is PrivacyFilter mode.
 HUB_AO_SuppressClientUpdateNotification		Suppress the update notification screen on the VPN Client.
 HUB_AO_FloodingSendQueueBufferQuota			Specify the quota limitation value (in bytes) of the sending queue buffer size which the flooding operation on the Virtual Hub can consume. The quota value is applied on the total length of sending queues of all active VPN sessions. Specify '0' to disable the quota. This option is effective to solve the out-of-memory problem on the network where there are many flooding packets.
+HUB_AO_AssignVLanIdByRadiusAttribute		Enable the VLAN ID dynamic assignment function. Each VPN session will be assigned its own VLAN ID by the RADIUS attribute value when the user is authenticated by the external RADIUS server unless the user object has a VLAN ID security policy. The RADIUS attribute with the name "Tunnel-Pvt-Group-ID" (ID = 81) will be used as the VLAN ID. The data type must be STRING.
+HUB_AO_SecureNAT_RandomizeAssignIp			If you set this option to non-zero value, then the Virtual DHCP Server of the SecureNAT function will choose an unused IP address randomly from the DHCP pool while the default behavior is to choose the first unused IP address.
+HUB_AO_DetectDormantSessionInterval			If you set this option to non-zero value, then the Virtual Hub will treat the VPN sessions, which have transmitted no packets for the last specified intervals (in seconds), as Dormant Sessions. The Virtual Hub will not flood packets, which should be flood, to any Dormant Sessions.
+HUB_AO_NoPhysicalIPOnPacketLog				If you set this option to non-zero value, then the physical IP addresses of VPN clients of either the source VPN session or the destination VPN session will not be recorded on the packet log file.
 
 
 # Concerning failed connection dialogs
@@ -1446,24 +1451,24 @@ SM_SESS_STATUS_REALUSER	User Name (Database)
 SM_SESS_STATUS_GROUPNAME	Group Name
 SM_CLIENT_IP			Client IP Address
 SM_CLIENT_HOSTNAME		Client Host Name
-SM_NODE_CLIENT_NAME		Client Product Name
-SM_NODE_CLIENT_VER		Client Version
-SM_NODE_CLIENT_BUILD	Client Build
-SM_NODE_SERVER_NAME		Server Product Name
-SM_NODE_SERVER_VER		Server Version
-SM_NODE_SERVER_BUILD	Server Build
-SM_NODE_CLIENT_OS_NAME	Client OS Name
-SM_NODE_CLIENT_OS_VER	Client OS Version
-SM_NODE_CLIENT_OS_PID	Client OS Product ID
-SM_NODE_CLIENT_HOST		Client Host Name
-SM_NODE_CLIENT_IP		Client IP Address 
-SM_NODE_CLIENT_PORT		Client Port
-SM_NODE_SERVER_HOST		Server Host Name
-SM_NODE_SERVER_IP		Server IP Address
-SM_NODE_SERVER_PORT		Server Port
-SM_NODE_PROXY_HOSTNAME	Proxy Host Name
-SM_NODE_PROXY_IP		Proxy IP Address
-SM_NODE_PROXY_PORT		Proxy Port
+SM_NODE_CLIENT_NAME		Client Product Name (Reported)
+SM_NODE_CLIENT_VER		Client Version (Reported)
+SM_NODE_CLIENT_BUILD	Client Build (Reported)
+SM_NODE_SERVER_NAME		Server Product Name (Reported)
+SM_NODE_SERVER_VER		Server Version (Reported)
+SM_NODE_SERVER_BUILD	Server Build (Reported)
+SM_NODE_CLIENT_OS_NAME	Client OS Name (Reported)
+SM_NODE_CLIENT_OS_VER	Client OS Version (Reported)
+SM_NODE_CLIENT_OS_PID	Client OS Product ID (Reported)
+SM_NODE_CLIENT_HOST		Client Host Name (Reported)
+SM_NODE_CLIENT_IP		Client IP Address  (Reported)
+SM_NODE_CLIENT_PORT		Client Port (Reported)
+SM_NODE_SERVER_HOST		Server Host Name (Reported)
+SM_NODE_SERVER_IP		Server IP Address (Reported)
+SM_NODE_SERVER_PORT		Server Port (Reported)
+SM_NODE_PROXY_HOSTNAME	Proxy Host Name (Reported)
+SM_NODE_PROXY_IP		Proxy IP Address (Reported)
+SM_NODE_PROXY_PORT		Proxy Port (Reported)
 SM_MAC_COLUMN_1			Session Name
 SM_MAC_COLUMN_2			MAC Address
 SM_MAC_COLUMN_3			Created at
@@ -1644,7 +1649,7 @@ SM_FACTORY_DEFAULT_WARNING		This will perform a factory-reset on the VPN Server 
 SM_FACTORY_DEFAULT_PERFORMED	The factory-reset operation is performing on the server.\r\n\r\nPress OK to exit the current session of VPN Server Manager.\r\nAfter exiting, please re-start the VPN Server Manager and connect to the VPN Server again.\r\nThen you will see the VPN Server is reset.
 SM_AZURE_STATUS_CONNECTED		Status: Connected
 SM_AZURE_STATUS_NOT_CONNECTED	Status: Not Connected
-SM_NO_BRIDGE_NICS				No physical network adapters suitable for Local Bridge were found on the VPN server computer.\r\nIn order to create a Local Bridge, you have to install at least one physical network adapters on the computer.\r\nYou cannot use Wi-Fi adapters or 3G adapters for Local Bridge.\r\nPlease install a physical network adapter which is compatible to wired Ethernet.\r\n\r\nIf a recently-installed network adapter doesn't appear, once reboot the computer.\r\n\r\nIf the Local Bridge cannot be used anyway, you can use "SecureNAT Function" instead.\r\n\r\nIf you have a certain reason to use unusual network adapters (i.e. Wi-Fi adapters, 3G adapters or virtual adapters), set the "ShowAllInterfaces" variable on the "LocalBridgeList" directive to "true" and restart the VPN Server. Then such devices will appear on the list. (For advanced Windows users only.)
+SM_NO_BRIDGE_NICS				No physical network adapters suitable for Local Bridge were found on the VPN server computer.\r\nIn order to create a Local Bridge, you have to install at least one physical network adapters on the computer.\r\nYou cannot use Wi-Fi adapters or 3G adapters for Local Bridge.\r\nPlease install a physical network adapter which is compatible to wired Ethernet.\r\n\r\nIf a recently-installed network adapter doesn't appear, once reboot the computer.\r\n\r\nIf the Local Bridge cannot be used anyway, you can use "SecureNAT Function" instead.\r\n\r\nIf you have a certain reason to use unusual network adapters (i.e. Wi-Fi adapters, 3G adapters or virtual adapters), set the "ShowAllInterfaces" variable on the "LocalBridgeList" directive to "true" and restart the VPN Server. Then such devices will appear on the list. (For advanced Windows users only.)\r\n\r\nIf this error occurs after you upgraded Windows, please re-install SoftEther VPN Server or SoftEther VPN Bridge>
 SM_CERT_MESSAGE					The current SSL self-signed root certificate on this VPN Server is in the old format.\r\n\r\nSome versions of OpenVPN Connect for Android have a bug to misinterpret SSL certificates in the old format. It might cause the connection problem from OpenVPN Connect for Android to this VPN Server.\r\n\r\nIf you are planning to use OpenVPN Connect for Android as a VPN client, it is recommended to regenerate the SSL server certificate.\r\n\r\nDo you want to regenerate the server certificate now?
 SM_CERT_MESSAGE_CLI				--- Caution ---\r\n\r\nThe current SSL self-signed root certificate on this VPN Server is in the old format.\r\n\r\nSome versions of OpenVPN Connect for Android have a bug to misinterpret SSL certificates in the old format. It might cause the connection problem from OpenVPN Connect for Android to this VPN Server.\r\n\r\nIf you are planning to use OpenVPN Connect for Android as a VPN client, it is recommended to regenerate the SSL server certificate.\r\n\r\nTo regenerate and update the server certificate, execute the "ServerCertRegenerate" command after updating the VPN Server to the latest version.
 SM_CERT_NEED_ROOT				The specified SSL certificate is a sub-certificate which was issued by a CA (Certificate Authority).\r\n\r\nIf you are planning to support either Microsoft SSTP or OpenVPN protocol on this VPN server, you have to install the root certificate and all intermediate certificates (if exists) on this VPN Server.\r\n\r\nTo install these certificates, copy the root certificate and all intermediate certificate files (in the X.509 format) into the "chain_certs" subdirectory on the directory which is VPN Server has been installed on.\r\n\r\nIf you don't know how to obtain root and intermediate certificate files for your certificate authority (CA), please refer to the CA's web site or contact technical support staffs of the CA.
@@ -1902,6 +1907,7 @@ LH_MAX_SESSION_2		Connection "%S": The maximum number of sessions (%u) that can 
 LH_NEW_SESSION			Connection "%S": The new session "%S" has been created. (IP address: %S, Port number: %u, Physical underlying protocol: "%S")
 LH_SET_SESSION			Session "%S": The parameter has been set. Max number of TCP connections: %u, Use of encryption: %s, Use of compression: %s, Use of Half duplex communication: %s, Timeout: %u seconds.
 LH_NODE_INFO			Session "%S": VPN Client details: (%s)
+LH_VLAN_ID				Session "%S": Assigned VLAN ID: %u
 LH_INVALID_SIGNATURE	Session "%S": The connected client sent invalid protocol data. Unable to establish normal communication with client. First check for problems with the connections and cabling of the network connecting the client and the server and then check there is not a special transparent packet re-writing device installed.
 LH_END_SESSION			Session "%S": The session has been terminated. The statistical information is as follows: Total outgoing data size: %I64u bytes, Total incoming data size: %I64u bytes.
 LH_BCAST_STORM			Session "%S": A large volume of broadcast packets has been detected. There are cases where packets are discarded based on the policy. The source MAC address is %S, the source IP address is %S, the destination IP address is %S. The number of broadcast packets is equal to or larger than %u items per 1 second (note this information is the result of mechanical analysis of part of the packets and could be incorrect).
@@ -2366,7 +2372,7 @@ S_INFO					A new Virtual Network Adapter will be created on the system.\r\nYou c
 STATIC1					Virtual Network Adapter &Name: 
 IDOK					&OK
 IDCANCEL				Cancel
-S_WIN8					Current operating system is Windows 8. The name of a Virtual Network Adapter must be 'VPN' or 'VPN2' to 'VPN127'. (Maximum 127 adapters can be created.)
+S_WIN8					The name of a Virtual Network Adapter must be 'VPN' or 'VPN2' to 'VPN127'. (Maximum 127 adapters can be created.)
 
 
 PREFIX					D_CM_TRUST
@@ -3839,7 +3845,7 @@ S_TOOL					Sample File Generating Tool for OpenVPN Clients
 S_TOOL2					Making a OpenVPN Client configuration file is a very difficult job. You can use this tool to generate an appropriate OpenVPN Client configuration file. The generated configuration sample can be used immediately.
 B_CONFIG				Generate a Sample &Configuration File for OpenVPN Clients
 S_2						Microsoft SSTP VPN Clone Server Function
-S_3						This VPN Server has the clone functions of MS-SSTP VPN Server which is on Windows Server 2008 / 2012 by Microsoft Corporation.\r\nBuilt-in MS-SSTP Clients on Windows Vista / 7 / 8 / RT can connect to this VPN Server.
+S_3						This VPN Server has the clone functions of MS-SSTP VPN Server which is on Windows Server 2008 / 2012 by Microsoft Corporation.\r\nBuilt-in MS-SSTP Clients on Windows Vista / 7 / 8 / RT / 10 can connect to this VPN Server.
 R_SSTP					Enable &MS-SSTP VPN Clone Server Function
 S_SSTP					The value of CN (Common Name) on the SSL certificate of VPN Server must match to the hostname specified on the client, and that certificate must be in the trusted list on the client. For details refer the Microsoft's documents.
 S_4						The manner to specify a username to connect to the Virtual Hub, and the selection rule of default Hub by using these clone server functions are same to the IPsec Server functions.
@@ -4208,7 +4214,7 @@ CMD_SWITCH_SELECT		Sw&itch Selection
 # [View] menu
 CMD_TOP_VIEW			&View
 CMD_STATUSBAR			Show &Status Bar
-CMD_VISTASTYLE			Windows Vista / Windows 7 Styles
+CMD_VISTASTYLE			Windows Vista / 7 / 8 / 10 Styles
 CMD_SHOWPORT			Show &Ports on Connection List
 CMD_TRAYICON			Show Icons on &Task Tray
 CMD_ICON				&Icon
@@ -4233,7 +4239,7 @@ CMD_PASSWORD			Set &Password...\tCtrl+P
 CMD_TRUST				Manage &Trusted CA Certificate List\tCtrl+R
 CMD_NETIF				&Network Device Status...
 CMD_TCPIP				TCP Optimization &Utility...
-CMD_MMCSS				Optimization for Windows &Vista / 7 / 8...
+CMD_MMCSS				Optimization for Windows &Vista / 7 / 8 / 10...
 CMD_TRAFFIC				Network T&raffic Speed Test Tool...\tCtrl+Q 
 CMD_CM_SETTING			Switch Operation &Mode...
 CMD_LANGUAGE			&Language Settings...
@@ -6219,7 +6225,7 @@ CMD_OpenVpnMakeConfig_ERROR			The sample setting files were unable to be saved a
 
 # SstpEnable command
 CMD_SstpEnable			Enable / Disable Microsoft SSTP VPN Clone Server Function
-CMD_SstpEnable_Help		This VPN Server has the clone functions of MS-SSTP VPN Server which is on Windows Server 2008 / 2012 by Microsoft Corporation. Standard MS-SSTP Clients in Windows Vista / 7 / 8 / RT can connect to this VPN Server.\n\n[Caution]\nThe value of CN (Common Name) on the SSL certificate of VPN Server must match to the hostname specified on the client, and that certificate must be in the trusted list on the SSTP VPN client. For details refer the Microsoft's documents.\nYou can use the ServerCertRegenerate command to replace the current certificate on the VPN Server to a new self-signed certificate which has the CN (Common Name) value in the fields. In that case, you have to register such a new self-signed certificate on the SSTP VPN Client as a trusted root certificate. If you do not want to do such a bother tasks, please consider to purchase a SSL certificate provided by commercial authority such as VeriSign or GlobalSign.\n\nThe manner to specify a username to connect to the Virtual Hub, and the selection rule of default Hub by using this clone server functions are same to the IPsec Server functions. For details, please see the help of the IPsecEnable command.\n\nTo execute this command, you must have VPN Server administrator privileges. \nThis command cannot be run on VPN Bridge.\nYou cannot execute this command for Virtual Hubs of VPN Servers operating as a cluster.
+CMD_SstpEnable_Help		This VPN Server has the clone functions of MS-SSTP VPN Server which is on Windows Server 2008 / 2012 by Microsoft Corporation. Standard MS-SSTP Clients in Windows Vista / 7 / 8 / RT / 10 can connect to this VPN Server.\n\n[Caution]\nThe value of CN (Common Name) on the SSL certificate of VPN Server must match to the hostname specified on the client, and that certificate must be in the trusted list on the SSTP VPN client. For details refer the Microsoft's documents.\nYou can use the ServerCertRegenerate command to replace the current certificate on the VPN Server to a new self-signed certificate which has the CN (Common Name) value in the fields. In that case, you have to register such a new self-signed certificate on the SSTP VPN Client as a trusted root certificate. If you do not want to do such a bother tasks, please consider to purchase a SSL certificate provided by commercial authority such as VeriSign or GlobalSign.\n\nThe manner to specify a username to connect to the Virtual Hub, and the selection rule of default Hub by using this clone server functions are same to the IPsec Server functions. For details, please see the help of the IPsecEnable command.\n\nTo execute this command, you must have VPN Server administrator privileges. \nThis command cannot be run on VPN Bridge.\nYou cannot execute this command for Virtual Hubs of VPN Servers operating as a cluster.
 CMD_SstpEnable_Args		SstpEnable [yes|no]
 CMD_SstpEnable_[yes|no]	Specify yes to enable the Microsoft SSTP VPN Clone Server Function. Specify no to disable.
 CMD_SstpEnable_Prompt_[yes|no]	Enables SSTP VPN Clone Server Function (yes / no): 
@@ -7032,6 +7038,8 @@ SW_WEB_ERROR_MSG							Failed to create a VPN Client Web Installer.
 SW_INSTALLER_CACHE_IS_NOT_SIGNED			The currently installed SoftEther VPN Client of this computer has not been installed from the digital-signed package signed by an Authenticode digital certificate of SoftEther VPN Project.\r\nIt might be installed from a customized installer (for example, an installer created by Easy Installer Creator.)\r\n\r\nIf you continue to create a Web Installer, a warning message will be appeared on the user's screen when its loading.\r\nTo avoid showing the warning message, you should cancel this creating wizard, download the latest version of SoftEther VPN Client from the SoftEther VPN Project's web site, re-install it and restart the Web Installer Creator wizard.\r\n\r\nDo you really to continue to create a Web Installer?
 SW_FILE_NOT_FOUNT							The file "%s" not found.
 SW_WEB_FINISHED								The Web Installer is created and saved as "%s".\r\n\r\nPlease extract inner files from the ZIP file, upload them into the Web server, and edit a HTML file and an inf file to replace URLs appropriately.\r\n\r\nThe explanation to deploy the Web Installer is described on the ZIP file.
+
+SW_VG_CONFIRM_MSG							Do you really want to install and activate the VPN Gate P2P Relay Function plug-in module with SoftEther VPN Client?\r\n\r\nThis plug-in will realize the stability of communication to bypass the government censorship firewall. However, the communication of VPN Gate usually consumes some network bandwidth. VPN Gate is not recommended to be used in the mobile connections. \r\n\r\nPlease note that there are some countries and regions which have the regulation to forbid the encrypted communications to bypass government censorship firewalls. In such a case, you must not use the VPN Gate functions on your computer. VPN Gate is intended to be used mainly in Japan. VPN Gate is a research project for just academic purpose only. VPN Gate is governed under the Japanese laws. Other countries' laws are none of our concerns nor responsibilities. By using this software and service, you must observe all concerned laws and rules with your own responsibility. You will be completely liable to any damages and responsibilities which are results of using this software and service, regardless of either inside or outside of Japan's territory.
 
 
 

@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -167,7 +167,12 @@ struct PACKET_ADAPTER
 	PA_PUTPACKET *PutPacket;
 	PA_FREE *Free;
 	void *Param;
+	UINT Id;
 };
+
+// Packet Adapter IDs
+#define	PACKET_ADAPTER_ID_VLAN_WIN32		1
+
 
 // Session structure
 struct SESSION
@@ -188,6 +193,7 @@ struct SESSION
 	bool InProcMode;				// In-process mode
 	THREAD *Thread;					// Management thread
 	CONNECTION *Connection;			// Connection
+	char ClientIP[64];				// Client IP
 	CLIENT_OPTION *ClientOption;	// Client connection options
 	CLIENT_AUTH *ClientAuth;		// Client authentication data
 	volatile bool Halt;				// Halting flag
@@ -230,6 +236,7 @@ struct SESSION
 
 	UINT64 CreatedTime;				// Creation date and time
 	UINT64 LastCommTime;			// Last communication date and time
+	UINT64 LastCommTimeForDormant;	// Last communication date and time (for dormant)
 	TRAFFIC *Traffic;				// Traffic data
 	TRAFFIC *OldTraffic;			// Old traffic data
 	UINT64 TotalSendSize;			// Total transmitted data size
@@ -260,6 +267,7 @@ struct SESSION
 	UINT64 CurrentConnectionEstablishTime;	// Completion time of this connection
 	UINT NumConnectionsEatablished;	// Number of connections established so far
 	UINT AdjustMss;					// MSS adjustment value
+	bool IsVPNClientAndVLAN_Win32;	// Is the VPN Client session with a VLAN card (Win32)
 
 	bool IsRUDPSession;				// Whether R-UDP session
 	UINT RUdpMss;					// The value of the MSS should be applied while the R-UDP is used

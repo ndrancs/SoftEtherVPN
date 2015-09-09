@@ -3,9 +3,9 @@
 // 
 // SoftEther VPN Server, Client and Bridge are free software under GPLv2.
 // 
-// Copyright (c) 2012-2014 Daiyuu Nobori.
-// Copyright (c) 2012-2014 SoftEther VPN Project, University of Tsukuba, Japan.
-// Copyright (c) 2012-2014 SoftEther Corporation.
+// Copyright (c) 2012-2015 Daiyuu Nobori.
+// Copyright (c) 2012-2015 SoftEther VPN Project, University of Tsukuba, Japan.
+// Copyright (c) 2012-2015 SoftEther Corporation.
 // 
 // All Rights Reserved.
 // 
@@ -124,7 +124,7 @@
 #define	NDIS_NEO_EVENT_NAME_WIN32			"Global\\NEO_EVENT_NEOADAPTER_%s"
 
 // Constant
-#define	NEO_MAX_PACKET_SIZE			1560
+#define	NEO_MAX_PACKET_SIZE			1600
 #define	NEO_MAX_PACKET_SIZE_ANNOUNCE	1514
 #define	NEO_MIN_PACKET_SIZE			14
 #define	NEO_PACKET_HEADER_SIZE		14
