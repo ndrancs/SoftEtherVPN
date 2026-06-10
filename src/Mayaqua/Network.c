@@ -16346,7 +16346,7 @@ TOKEN_LIST *GetCipherList()
 		return ciphers;
 	}
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || LIBRESSL_VERSION_NUMBER >= 0x2090100L
 	sk = SSL_get1_supported_ciphers(ssl);
 #else
 	sk = SSL_get_ciphers(ssl);
