@@ -11852,7 +11852,7 @@ bool StartSSLEx3(SOCK *sock, X *x, K *priv, LIST *chain, UINT ssl_timeout, char 
 			}
 		}
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) ||  LIBRESSL_VERSION_NUMBER >= 0x3060000L
 		if (sock->SslAcceptSettings.Override_Security_Level)
 		{
 			SSL_CTX_set_security_level(ssl_ctx, sock->SslAcceptSettings.Override_Security_Level_Value);
@@ -16262,7 +16262,7 @@ UINT GetOSSecurityLevel()
 	}
 
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || LIBRESSL_VERSION_NUMBER >= 0x3060000L
 	security_level_new = SSL_CTX_get_security_level(ctx);
 #endif
 
